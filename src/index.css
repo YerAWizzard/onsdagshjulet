@@ -1,0 +1,35 @@
+:root {
+  font-family:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", sans-serif;
+  color: #f8fafc;
+  background: #080610;
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at top left, #21153c 0, transparent 42%),
+    radial-gradient(circle at top right, #34132c 0, transparent 38%),
+    linear-gradient(145deg, #080610 0%, #0a1022 48%, #160b22 100%);
+}
+
+#root {
+  min-height: 100svh;
+}
