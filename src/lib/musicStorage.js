@@ -11,8 +11,12 @@ export function loadMusicPreferences() {
       MUSIC_TRACKS[saved.mode].length - 1,
     )
     const parsedVolume = Number(saved.volume)
+    const parsedEffectsVolume = Number(saved.effectsVolume)
     return {
       enabled: Boolean(saved.enabled),
+      effectsVolume: Number.isFinite(parsedEffectsVolume)
+        ? Math.min(Math.max(parsedEffectsVolume, 0), 1)
+        : DEFAULT_MUSIC.effectsVolume,
       mode: saved.mode,
       trackIndex,
       volume: Number.isFinite(parsedVolume)

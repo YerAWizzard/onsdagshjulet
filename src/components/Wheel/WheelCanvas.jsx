@@ -13,6 +13,7 @@ import {
 import {
   calculateTargetRotation,
   createSpinPlan,
+  getFullRotations,
   getSpinProgress,
   getWinnerIndex,
   normalizeAngle,
@@ -154,7 +155,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
     [],
   )
 
-  const spin = useCallback((winnerItemIndex) => {
+  const spin = useCallback((winnerItemIndex, duration) => {
     if (spinningRef.current || items.length < 2) return false
 
     spinningRef.current = true
@@ -172,9 +173,9 @@ const WheelCanvas = forwardRef(function WheelCanvas(
         .map((itemIndex, segmentIndex) => (itemIndex === winnerItemIndex ? segmentIndex : -1))
         .filter((segmentIndex) => segmentIndex >= 0)
       const winnerSegment = candidates[Math.floor(Math.random() * candidates.length)]
-      const fullRotations = 7 + Math.floor(Math.random() * 3)
+      const fullRotations = getFullRotations(duration)
       plan = {
-        duration: 5200 + Math.random() * 900,
+        duration,
         startRotation: rotationRef.current,
         targetRotation: calculateTargetRotation(
           rotationRef.current,
@@ -192,7 +193,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
       const progress = Math.min(elapsed, 1)
 
       rotationRef.current =
-        plan.startRotation + totalDistance * getSpinProgress(progress)
+        plan.startRotation + totalDistance * getSpinProgress(progress, plan.duration)
       renderWheel()
 
       const tickInterval = 65 + progress * 150

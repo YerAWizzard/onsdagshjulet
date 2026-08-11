@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import CollapsibleSection from './components/ControlPanel/CollapsibleSection.jsx'
+import AudioSettings from './components/ControlPanel/AudioSettings.jsx'
+import SessionControls from './components/ControlPanel/SessionControls.jsx'
+import SpinSettings from './components/ControlPanel/SpinSettings.jsx'
 import Templates from './components/ControlPanel/Templates.jsx'
 import WheelSettings from './components/ControlPanel/WheelSettings.jsx'
 import Wheel from './components/Wheel/Wheel.jsx'
@@ -17,7 +20,7 @@ import {
 
 let optionId = 0
 const COLLAPSED_SECTIONS_KEY = 'onsdagshjulet:collapsed-sections:v1'
-const OPEN_SECTIONS = { settings: false, audio: false, session: false, templates: false }
+const OPEN_SECTIONS = { settings: false, audio: false, spin: true, session: true, templates: true }
 
 function loadCollapsedSections() {
   try {
@@ -55,15 +58,30 @@ function hydrateOptions(options) {
   )
 }
 
+function formatSavedAt(value) {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    day: '2-digit', hour: '2-digit', hour12: false, minute: '2-digit', month: '2-digit', year: 'numeric',
+  }).formatToParts(date).reduce((result, part) => ({ ...result, [part.type]: part.value }), {})
+  return `${parts.year}-${parts.month}-${parts.day} - ${parts.hour}:${parts.minute}`
+}
+
 function App() {
   const [locale, setLocale] = useState('sv')
   const [collapsedSections, setCollapsedSections] = useState(loadCollapsedSections)
   const [options, setOptions] = useState(DEFAULT_OPTIONS)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [pendingTemplate, setPendingTemplate] = useState(null)
+  const [inspirationIndex] = useState(() => Math.floor(Math.random() * 5) + 1)
   const [audio, setAudio] = useState(loadMusicPreferences)
-  const [canRestore, setCanRestore] = useState(() => hasSavedSession())
+  const [initialSession] = useState(() => restoreSession())
+  const [canRestore, setCanRestore] = useState(() => Boolean(initialSession))
+  const [savedAt, setSavedAt] = useState(() => formatSavedAt(initialSession?.savedAt))
+  const [sessionConfirmation, setSessionConfirmation] = useState(null)
   const [sessionMessage, setSessionMessage] = useState('')
+  const [spinSettings, setSpinSettings] = useState({ minSeconds: 3, maxSeconds: 11 })
   const audioEngineRef = useRef(null)
   const initialAudioRef = useRef(audio)
 
@@ -75,6 +93,7 @@ function App() {
     engine.setMode(initialAudio.mode)
     engine.setTrack(initialAudio.trackIndex)
     engine.setVolume(initialAudio.volume)
+    engine.setEffectsVolume(initialAudio.effectsVolume)
     engine.setEnabled(initialAudio.enabled)
 
     const unlockAudio = () => engine.unlock()
@@ -140,6 +159,7 @@ function App() {
       const next = { ...current, ...updates }
       if ('mode' in updates && updates.mode !== current.mode) next.trackIndex = 0
       if ('volume' in updates) audioEngineRef.current.setVolume(next.volume)
+      if ('effectsVolume' in updates) audioEngineRef.current.setEffectsVolume(next.effectsVolume)
       if ('mode' in updates) audioEngineRef.current.setMode(next.mode)
       if ('trackIndex' in updates) audioEngineRef.current.setTrack(next.trackIndex)
       if ('enabled' in updates) audioEngineRef.current.setEnabled(next.enabled)
@@ -155,11 +175,13 @@ function App() {
     setSessionMessage('')
   }
 
-  const handleSaveSession = () => {
+  const saveCurrentSession = () => {
+    const nextSavedAt = new Date().toISOString()
     const saved = saveSession({
       version: 1,
       audio: {
         enabled: audio.enabled,
+        effectsVolume: audio.effectsVolume,
         mode: audio.mode,
         trackIndex: audio.trackIndex,
         volume: audio.volume,
@@ -168,17 +190,31 @@ function App() {
       options: options.map(({ label, percentage, star }) => ({ label, percentage, star })),
       selectedMusic: audio.mode,
       selectedTemplate,
+      savedAt: nextSavedAt,
+      spinSettings,
       volume: audio.volume,
     })
     setCanRestore(saved)
+    if (saved) setSavedAt(formatSavedAt(nextSavedAt))
     setSessionMessage(saved ? 'saved' : 'saveFailed')
+    setSessionConfirmation(null)
   }
 
-  const handleRestoreSession = () => {
+  const handleSaveSession = () => {
+    if (canRestore) {
+      setSessionConfirmation('overwrite')
+      return
+    }
+    saveCurrentSession()
+  }
+
+  const restoreSavedSession = () => {
     const session = restoreSession()
     if (!session) {
       setCanRestore(false)
       setSessionMessage('missing')
+      setSavedAt('')
+      setSessionConfirmation(null)
       return
     }
     setOptions(hydrateOptions(session.options))
@@ -186,6 +222,7 @@ function App() {
     setLocale(session.locale === 'en' ? 'en' : 'sv')
     const restoredAudio = {
       enabled: Boolean(session.audio?.enabled),
+      effectsVolume: Math.min(1, Math.max(0, Number(session.audio?.effectsVolume ?? DEFAULT_MUSIC.effectsVolume))),
       mode: MUSIC_TRACKS[session.selectedMusic || session.audio?.mode]
         ? (session.selectedMusic || session.audio?.mode)
         : DEFAULT_MUSIC.mode,
@@ -198,48 +235,69 @@ function App() {
     )
     setAudio(restoredAudio)
     audioEngineRef.current.setVolume(restoredAudio.volume)
+    audioEngineRef.current.setEffectsVolume(restoredAudio.effectsVolume)
     audioEngineRef.current.setMode(restoredAudio.mode)
     audioEngineRef.current.setTrack(restoredAudio.trackIndex)
     audioEngineRef.current.setEnabled(restoredAudio.enabled)
+    if (session.spinSettings) {
+      const minSeconds = Math.min(11, Math.max(2, Number(session.spinSettings.minSeconds) || 3))
+      const maxSeconds = Math.min(11, Math.max(minSeconds, Number(session.spinSettings.maxSeconds) || 11))
+      setSpinSettings({ minSeconds, maxSeconds })
+    }
+    setSavedAt(formatSavedAt(session.savedAt))
     setSessionMessage('restored')
+    setSessionConfirmation(null)
   }
 
-  const handleDeleteSession = () => {
+  const deleteSavedSession = () => {
     const deleted = deleteSession()
     setCanRestore(!deleted && hasSavedSession())
+    if (deleted) setSavedAt('')
     setSessionMessage(deleted ? 'deleted' : 'deleteFailed')
+    setSessionConfirmation(null)
+  }
+
+  const confirmSessionAction = () => {
+    if (sessionConfirmation === 'overwrite') saveCurrentSession()
+    if (sessionConfirmation === 'restore') restoreSavedSession()
+    if (sessionConfirmation === 'delete') deleteSavedSession()
   }
 
   return (
     <div className="app-shell">
       <div className="background-glow" aria-hidden="true" />
 
-      <header className="app-header">
-        <div className="language-switch" aria-label="Language / Språk">
-          <button
-            aria-pressed={locale === 'sv'}
-            className={locale === 'sv' ? 'is-active' : ''}
-            onClick={() => { setLocale('sv'); setPendingTemplate(null) }}
-            type="button"
-          >
-            🇸🇪 Svenska
-          </button>
-          <button
-            aria-pressed={locale === 'en'}
-            className={locale === 'en' ? 'is-active' : ''}
-            onClick={() => { setLocale('en'); setPendingTemplate(null) }}
-            type="button"
-          >
-            🇬🇧 English
-          </button>
-        </div>
-        <div className="brand-line">
-          <h1><span aria-hidden="true">🎪</span> Onsdagshjulet</h1>
-        </div>
-        <p>{t('subtitle')}</p>
-      </header>
-
       <main className="workspace">
+        <header className="app-header">
+          <div className="language-switch" aria-label="Language / Språk">
+            <button
+              aria-label="🇸🇪 Svenska"
+              aria-pressed={locale === 'sv'}
+              className={locale === 'sv' ? 'is-active' : ''}
+              onClick={() => { setLocale('sv'); setPendingTemplate(null) }}
+              type="button"
+            >
+              <span className="language-flag language-flag--sv" aria-hidden="true" />
+              <span>Svenska</span>
+            </button>
+            <button
+              aria-label="🇬🇧 English"
+              aria-pressed={locale === 'en'}
+              className={locale === 'en' ? 'is-active' : ''}
+              onClick={() => { setLocale('en'); setPendingTemplate(null) }}
+              type="button"
+            >
+              <span className="language-flag language-flag--en" aria-hidden="true" />
+              <span>English</span>
+            </button>
+          </div>
+          <div className="brand-line">
+            <h1><span aria-hidden="true">🎪</span> Onsdagshjulet</h1>
+          </div>
+          <p className="header-title">{t('headerTitle')}</p>
+          <p>{t('subtitle')}</p>
+        </header>
+
         <aside className="sidebar" aria-label={t('controlsLabel')}>
           <CollapsibleSection
             accentClass="card-accent--pink"
@@ -250,23 +308,22 @@ function App() {
             title={t('settings.title')}
           >
             <WheelSettings
-              audio={audio}
-              collapsedSections={collapsedSections}
-              canRestore={canRestore}
               onAdd={addOption}
-              onAudioChange={updateAudio}
-              onDeleteSession={handleDeleteSession}
               onRemove={removeOption}
-              onRestoreSession={handleRestoreSession}
-              onSaveSession={handleSaveSession}
               onUpdate={updateOption}
               options={options}
               probabilities={probabilityResult.probabilities}
               probabilityError={localizedProbabilityError}
-              sessionMessage={sessionMessage ? t(`session.${sessionMessage}`) : ''}
               t={t}
-              onToggleSection={toggleSection}
             />
+          </CollapsibleSection>
+
+          <CollapsibleSection accentClass="card-accent--blue" className="audio-card" collapsed={collapsedSections.audio} id="audio-settings" onToggle={() => toggleSection('audio')} title={t('audio.title')}>
+            <AudioSettings audio={audio} onChange={updateAudio} t={t} />
+          </CollapsibleSection>
+
+          <CollapsibleSection accentClass="card-accent--pink" className="spin-card" collapsed={collapsedSections.spin} id="spin-settings" onToggle={() => toggleSection('spin')} title={t('spinSettings.title')}>
+            <SpinSettings {...spinSettings} onChange={(updates) => setSpinSettings((current) => ({ ...current, ...updates }))} t={t} />
           </CollapsibleSection>
 
           <CollapsibleSection
@@ -285,6 +342,22 @@ function App() {
               selectedTemplate={selectedTemplate}
               t={t}
               templates={templates}
+              help={t(`templates.help${inspirationIndex}`)}
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection accentClass="card-accent--blue" className="session-card secondary-section" collapsed={collapsedSections.session} id="session" onToggle={() => toggleSection('session')} title={t('session.title')}>
+            <SessionControls
+              canRestore={canRestore}
+              confirmation={sessionConfirmation}
+              onCancel={() => setSessionConfirmation(null)}
+              onConfirm={confirmSessionAction}
+              onDelete={() => setSessionConfirmation('delete')}
+              onRestore={() => setSessionConfirmation('restore')}
+              onSave={handleSaveSession}
+              savedAt={savedAt}
+              sessionMessage={sessionMessage ? t(`session.${sessionMessage}`) : ''}
+              t={t}
             />
           </CollapsibleSection>
         </aside>
@@ -295,6 +368,7 @@ function App() {
             options={options}
             probabilities={probabilityResult.probabilities}
             probabilityError={probabilityResult.error}
+            spinSettings={spinSettings}
             t={t}
           />
         </section>
@@ -302,8 +376,7 @@ function App() {
 
       <footer className="app-footer" aria-label={t('footer.label')}>
         <span>{t('footer.version')}</span>
-        <span>{t('footer.local')}</span>
-        <span>{t('footer.noAccount')}</span>
+        <span>{t('footer.storage')}</span>
       </footer>
     </div>
   )

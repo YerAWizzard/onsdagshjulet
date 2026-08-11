@@ -26,6 +26,7 @@ export const MUSIC_TRACKS = {
 export const MUSIC_THEMES = Object.keys(MUSIC_TRACKS)
 export const DEFAULT_MUSIC = {
   enabled: false,
+  effectsVolume: 0.7,
   mode: 'Fantasy',
   trackIndex: 0,
   volume: 0.55,
@@ -36,9 +37,13 @@ export class AudioEngine {
     this.context = null
     this.effectsGain = null
     this.enabled = DEFAULT_MUSIC.enabled
+    this.effectsVolume = DEFAULT_MUSIC.effectsVolume
     this.mode = DEFAULT_MUSIC.mode
     this.trackIndex = DEFAULT_MUSIC.trackIndex
     this.volume = DEFAULT_MUSIC.volume
+    this.musicDuckFactor = 1
+    this.volumeAnimationFrame = null
+    this.isDestroyed = false
     this.hasInteracted = false
     this.music = new Audio(MUSIC_TRACKS[this.mode][this.trackIndex])
     this.music.loop = true
@@ -52,7 +57,7 @@ export class AudioEngine {
     if (!AudioContextClass) return false
     this.context = new AudioContextClass()
     this.effectsGain = this.context.createGain()
-    this.effectsGain.gain.value = 0.24 * this.volume
+    this.effectsGain.gain.value = 0.24 * this.effectsVolume
     this.effectsGain.connect(this.context.destination)
     return true
   }
@@ -108,9 +113,49 @@ export class AudioEngine {
     this.volume = Number.isFinite(parsedVolume)
       ? Math.min(Math.max(parsedVolume, 0), 1)
       : DEFAULT_MUSIC.volume
-    this.music.volume = this.volume
+    this.setMusicPlaybackVolume(this.volume * this.musicDuckFactor, 90)
+  }
+
+  setMusicPlaybackVolume(volume, duration = 0) {
+    if (this.isDestroyed) return
+    const targetVolume = Math.min(1, Math.max(0, Number(volume) || 0))
+    if (this.volumeAnimationFrame) cancelAnimationFrame(this.volumeAnimationFrame)
+    this.volumeAnimationFrame = null
+    if (!duration) {
+      this.music.volume = targetVolume
+      return
+    }
+    const startVolume = this.music.volume
+    const startedAt = performance.now()
+    const animateVolume = (currentTime) => {
+      const progress = Math.min((currentTime - startedAt) / duration, 1)
+      this.music.volume = startVolume + (targetVolume - startVolume) * progress
+      if (progress < 1) {
+        this.volumeAnimationFrame = requestAnimationFrame(animateVolume)
+      } else {
+        this.volumeAnimationFrame = null
+      }
+    }
+    this.volumeAnimationFrame = requestAnimationFrame(animateVolume)
+  }
+
+  duckMusic(factor = 0.85) {
+    this.musicDuckFactor = Math.min(1, Math.max(0, Number(factor) || 0))
+    this.setMusicPlaybackVolume(this.volume * this.musicDuckFactor, 140)
+  }
+
+  restoreMusic() {
+    this.musicDuckFactor = 1
+    this.setMusicPlaybackVolume(this.volume, 220)
+  }
+
+  setEffectsVolume(volume) {
+    const parsedVolume = Number(volume)
+    this.effectsVolume = Number.isFinite(parsedVolume)
+      ? Math.min(Math.max(parsedVolume, 0), 1)
+      : DEFAULT_MUSIC.effectsVolume
     if (this.effectsGain) {
-      this.effectsGain.gain.setTargetAtTime(0.24 * this.volume, this.context.currentTime, 0.015)
+      this.effectsGain.gain.setTargetAtTime(0.24 * this.effectsVolume, this.context.currentTime, 0.015)
     }
   }
 
@@ -132,7 +177,7 @@ export class AudioEngine {
   }
 
   playTick() {
-    this.tone(920, 0.03, 'square', 0.055)
+    this.tone(920, 0.03, 'square', 0.07)
   }
 
   playCountdown(isFinal = false) {
@@ -160,6 +205,10 @@ export class AudioEngine {
   }
 
   destroy() {
+    this.isDestroyed = true
+    if (this.volumeAnimationFrame) cancelAnimationFrame(this.volumeAnimationFrame)
+    this.volumeAnimationFrame = null
+    this.musicDuckFactor = 1
     this.music.pause()
     this.music.removeAttribute('src')
     this.music.load()

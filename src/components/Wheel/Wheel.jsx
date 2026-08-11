@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { pickWeightedIndex } from '../../lib/probability.js'
+import { getRandomSpinDuration } from './WheelPhysics.js'
 import WheelCanvas from './WheelCanvas.jsx'
 import WheelPointer from './WheelPointer.jsx'
 import WheelResult from './WheelResult.jsx'
@@ -12,7 +13,7 @@ const BULBS = Array.from({ length: 44 }, (_, index) => ({
   delay: `${(index % 7) * 0.07}s`,
 }))
 
-function Wheel({ audioEngine, options, probabilities, probabilityError, t }) {
+function Wheel({ audioEngine, options, probabilities, probabilityError, spinSettings, t }) {
   const wheelRef = useRef(null)
   const countdownTimersRef = useRef([])
   const [isSpinning, setIsSpinning] = useState(false)
@@ -31,13 +32,15 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, t }) {
 
   useEffect(() => () => {
     countdownTimersRef.current.forEach(clearTimeout)
-  }, [])
+    audioEngine.restoreMusic()
+  }, [audioEngine])
 
   const handleSpinComplete = useCallback(
     (winnerIndex) => {
       const winningOption = options[winnerIndex]
       const result = { ...winningOption, winId: `${Date.now()}-${Math.random()}` }
       setWinner(result)
+      audioEngine.restoreMusic()
       audioEngine.playWin(result.star)
     },
     [audioEngine, options],
@@ -48,11 +51,16 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, t }) {
     setWinner(null)
     setIsCountingDown(true)
     const winnerIndex = pickWeightedIndex(probabilities)
+    const spinDuration = getRandomSpinDuration(
+      spinSettings.minSeconds,
+      spinSettings.maxSeconds,
+    )
+    audioEngine.duckMusic()
     const steps = [
       { at: 0, text: '3' },
-      { at: 375, text: '2' },
-      { at: 750, text: '1' },
-      { at: 1125, text: t('wheel.countdownSpin') },
+      { at: 525, text: '2' },
+      { at: 1050, text: '1' },
+      { at: 1575, text: t('wheel.countdownSpin') },
     ]
 
     countdownTimersRef.current.forEach(clearTimeout)
@@ -63,9 +71,10 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, t }) {
     countdownTimersRef.current.push(setTimeout(() => {
       setCountdownText('')
       setIsCountingDown(false)
-      wheelRef.current?.spin(winnerIndex)
-    }, 1500))
-  }, [audioEngine, isCountingDown, isSpinning, probabilities, probabilityError, t])
+      const started = wheelRef.current?.spin(winnerIndex, spinDuration)
+      if (!started) audioEngine.restoreMusic()
+    }, 2100))
+  }, [audioEngine, isCountingDown, isSpinning, probabilities, probabilityError, spinSettings, t])
 
   const isBusy = isCountingDown || isSpinning
 
@@ -104,7 +113,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, t }) {
         />
         <WheelPointer isSpinning={isSpinning} />
         {isCountingDown ? (
-          <div className="wheel-countdown" key={countdownText} aria-live="assertive">
+          <div className={`wheel-countdown${countdownText === '1' ? ' wheel-countdown--final-number' : ''}`} key={countdownText} aria-live="assertive">
             <strong>{countdownText}</strong>
           </div>
         ) : null}

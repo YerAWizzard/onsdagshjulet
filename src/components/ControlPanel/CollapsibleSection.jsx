@@ -1,8 +1,25 @@
+import { useEffect, useRef } from 'react'
+import { scrollIntoSidebarView } from './scrollIntoSidebarView.js'
+
 function CollapsibleSection({ accentClass, children, className = '', collapsed, id, onToggle, title }) {
   const contentId = `${id}-content`
+  const sectionRef = useRef(null)
+  const wasCollapsedRef = useRef(collapsed)
+
+  useEffect(() => {
+    const wasCollapsed = wasCollapsedRef.current
+    wasCollapsedRef.current = collapsed
+    if (!wasCollapsed || collapsed) return undefined
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const timer = setTimeout(
+      () => scrollIntoSidebarView(sectionRef.current),
+      reducedMotion ? 0 : 280,
+    )
+    return () => clearTimeout(timer)
+  }, [collapsed])
 
   return (
-    <section className={`glass-card collapsible-section ${className}${collapsed ? ' is-collapsed' : ''}`}>
+    <section ref={sectionRef} className={`glass-card collapsible-section ${className}${collapsed ? ' is-collapsed' : ''}`}>
       <button
         aria-controls={contentId}
         aria-expanded={!collapsed}
