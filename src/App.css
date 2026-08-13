@@ -1108,6 +1108,7 @@
   }
 
   .workspace {
+    height: 100%;
     grid-template-rows: auto auto auto minmax(0, 1fr);
     row-gap: 0;
   }
@@ -1171,8 +1172,10 @@
     grid-column: 2;
     grid-row: 4;
     top: 6rem;
-    margin-top: -10px;
-    padding-top: 0.3rem;
+    height: auto;
+    margin-top: clamp(7px, calc(17.628svh - 130.4px), 60px);
+    padding-top: 0;
+    align-self: stretch;
   }
 
   .template-row {

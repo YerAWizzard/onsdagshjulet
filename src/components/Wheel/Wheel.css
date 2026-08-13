@@ -490,15 +490,54 @@
 
 @media (min-width: 1101px) {
   .wheel-engine {
-    justify-content: center;
+    height: 100%;
+    min-height: 0;
+    justify-content: flex-start;
+    padding-bottom: clamp(0.3rem, 0.75svh, 0.5rem);
   }
 
   .wheel-visual {
-    width: min(100%, calc(100svh - 15.75rem), 720px);
+    width: auto;
+    max-width: 100%;
+    max-height: 720px;
+    flex: 1 1 720px;
+  }
+
+  .wheel-pointer {
+    width: clamp(58px, 13cqw, 76px);
+    height: auto;
+    aspect-ratio: 19 / 22;
   }
 
   .spin-button {
-    min-height: 3.7rem;
+    min-height: clamp(3rem, 6svh, 3.5rem);
+    flex-shrink: 0;
+    margin-top: clamp(0.25rem, calc(1.667svh - 8px), 0.625rem);
+    padding-block: clamp(0.65rem, 1.3svh, 0.95rem);
+  }
+
+  .wheel-result {
+    min-height: clamp(4.75rem, calc(15.556svh - 2.25rem), 8.25rem);
+    flex-shrink: 0;
+    margin-top: clamp(0.25rem, calc(1.667svh - 8px), 0.625rem);
+    padding: clamp(0.35rem, calc(3.333svh - 1.125rem), 1.125rem);
+  }
+
+  .wheel-result__placeholder strong {
+    font-size: clamp(1.65rem, 4.5svh, 3rem);
+  }
+
+  .wheel-result__placeholder,
+  .wheel-result__content {
+    gap: clamp(0.18rem, 0.7svh, 0.45rem);
+  }
+
+  .wheel-result__label {
+    font-size: clamp(0.65rem, 1.2svh, 0.78rem);
+  }
+
+  .wheel-result strong {
+    font-size: clamp(2rem, 6svh, 4.2rem);
   }
 }
 

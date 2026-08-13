@@ -73,7 +73,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
       setIsCountingDown(false)
       const started = wheelRef.current?.spin(winnerIndex, spinDuration)
       if (!started) audioEngine.restoreMusic()
-    }, 2100))
+    }, 2400))
   }, [audioEngine, isCountingDown, isSpinning, probabilities, probabilityError, spinSettings, t])
 
   const isBusy = isCountingDown || isSpinning

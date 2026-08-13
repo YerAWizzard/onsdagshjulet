@@ -2,6 +2,8 @@ export const FULL_TURN = Math.PI * 2
 
 const MIN_SPIN_SECONDS = 2
 const MAX_SPIN_SECONDS = 11
+const LANDING_POSITION_COUNT = 6
+const LANDING_SAFE_RATIO = 0.85
 
 function clampDurationSeconds(value, fallback) {
   const parsedValue = Number(value)
@@ -30,7 +32,18 @@ export function getWinnerIndex(rotation, segmentCount) {
   if (segmentCount <= 0) return -1
 
   const segmentAngle = FULL_TURN / segmentCount
-  return Math.round(normalizeAngle(-rotation) / segmentAngle) % segmentCount
+  return Math.floor(normalizeAngle(-rotation) / segmentAngle) % segmentCount
+}
+
+export function getSegmentLandingOffset(segmentCount, randomValue = Math.random()) {
+  const segmentAngle = FULL_TURN / segmentCount
+  const safeHalfRange = segmentAngle * LANDING_SAFE_RATIO / 2
+  const positionIndex = Math.min(
+    LANDING_POSITION_COUNT - 1,
+    Math.floor(Math.max(0, randomValue) * LANDING_POSITION_COUNT),
+  )
+
+  return -safeHalfRange + positionIndex * (safeHalfRange * 2 / (LANDING_POSITION_COUNT - 1))
 }
 
 export function calculateTargetRotation(
@@ -38,9 +51,10 @@ export function calculateTargetRotation(
   segmentCount,
   winnerIndex,
   fullRotations,
+  landingOffset = 0,
 ) {
   const segmentAngle = FULL_TURN / segmentCount
-  const targetAlignment = normalizeAngle(-winnerIndex * segmentAngle)
+  const targetAlignment = normalizeAngle(-(winnerIndex + 0.5) * segmentAngle + landingOffset)
   const currentAlignment = normalizeAngle(currentRotation)
   const alignmentDistance = normalizeAngle(targetAlignment - currentAlignment)
 
@@ -51,11 +65,13 @@ export function createSpinPlan(currentRotation, segmentCount) {
   const winnerIndex = Math.floor(Math.random() * segmentCount)
   const fullRotations = 7 + Math.floor(Math.random() * 3)
   const duration = 5200 + Math.random() * 900
+  const landingOffset = getSegmentLandingOffset(segmentCount)
   const targetRotation = calculateTargetRotation(
     currentRotation,
     segmentCount,
     winnerIndex,
     fullRotations,
+    landingOffset,
   )
 
   return {

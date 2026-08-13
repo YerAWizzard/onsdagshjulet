@@ -14,6 +14,7 @@ import {
   calculateTargetRotation,
   createSpinPlan,
   getFullRotations,
+  getSegmentLandingOffset,
   getSpinProgress,
   getWinnerIndex,
   normalizeAngle,
@@ -174,6 +175,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
         .filter((segmentIndex) => segmentIndex >= 0)
       const winnerSegment = candidates[Math.floor(Math.random() * candidates.length)]
       const fullRotations = getFullRotations(duration)
+      const landingOffset = getSegmentLandingOffset(segmentCount)
       plan = {
         duration,
         startRotation: rotationRef.current,
@@ -182,6 +184,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
           segmentCount,
           winnerSegment,
           fullRotations,
+          landingOffset,
         ),
       }
     }
