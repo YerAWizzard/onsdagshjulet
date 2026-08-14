@@ -63,13 +63,21 @@ const WheelCanvas = forwardRef(function WheelCanvas(
     )
     const celebration = celebrationRef.current
     if (celebration) {
+      const center = size / 2
+      const innerRadius = size * 0.105
       const step = (Math.PI * 2) / visualOrderRef.current.length
       const start = -Math.PI / 2 + celebration.segmentIndex * step
       const progress = Math.min((performance.now() - celebration.startedAt) / 1300, 1)
       const pulse = Math.sin(progress * Math.PI * 3) * (1 - progress)
+      context.save()
       context.beginPath()
-      context.moveTo(size / 2, size / 2)
-      context.arc(size / 2, size / 2, size * 0.465, start, start + step)
+      context.rect(0, 0, size, size)
+      context.moveTo(center + innerRadius, center)
+      context.arc(center, center, innerRadius, 0, Math.PI * 2)
+      context.clip('evenodd')
+      context.beginPath()
+      context.moveTo(center, center)
+      context.arc(center, center, size * 0.465, start, start + step)
       context.closePath()
       context.fillStyle = celebration.isStarPrize
         ? `rgba(255, 238, 138, ${0.16 + Math.max(0, pulse) * 0.28})`
@@ -80,6 +88,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
         ? `rgba(255, 230, 104, ${0.55 + Math.max(0, pulse) * 0.4})`
         : `rgba(255, 255, 255, ${0.45 + Math.max(0, pulse) * 0.35})`
       context.stroke()
+      context.restore()
     }
     context.restore()
   }, [])

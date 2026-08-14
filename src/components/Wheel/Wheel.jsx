@@ -105,6 +105,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
           />
         </div>
         <button
+          aria-busy={isBusy}
           aria-label={t('wheel.spinFromCenter')}
           className="wheel-center-trigger"
           disabled={isBusy || Boolean(probabilityError)}

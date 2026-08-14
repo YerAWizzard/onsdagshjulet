@@ -2,6 +2,8 @@ import { MUSIC_THEMES, MUSIC_TRACKS } from '../../lib/AudioEngine.js'
 
 function AudioSettings({ audio, onChange, t }) {
   const trackCount = MUSIC_TRACKS[audio.mode].length
+  const updateEffectsVolume = (event) => onChange({ effectsVolume: Number(event.currentTarget.value) / 100 })
+  const updateMusicVolume = (event) => onChange({ volume: Number(event.currentTarget.value) / 100 })
 
   return (
     <div className="settings-content audio-settings">
@@ -39,12 +41,12 @@ function AudioSettings({ audio, onChange, t }) {
       </div>
       <label className="volume-control">
         <span>{t('audio.volume')}</span>
-        <input aria-label={t('audio.volume')} max="100" min="0" onChange={(event) => onChange({ volume: Number(event.target.value) / 100 })} type="range" value={Math.round(audio.volume * 100)} />
+        <input aria-label={t('audio.volume')} max="100" min="0" onChange={updateMusicVolume} onInput={updateMusicVolume} type="range" value={Math.round(audio.volume * 100)} />
         <span>{Math.round(audio.volume * 100)}%</span>
       </label>
       <label className="volume-control">
         <span>{t('audio.effectsVolume')}</span>
-        <input aria-label={t('audio.effectsVolume')} max="100" min="0" onChange={(event) => onChange({ effectsVolume: Number(event.target.value) / 100 })} type="range" value={Math.round(audio.effectsVolume * 100)} />
+        <input aria-label={t('audio.effectsVolume')} max="100" min="0" onChange={updateEffectsVolume} onInput={updateEffectsVolume} type="range" value={Math.round(audio.effectsVolume * 100)} />
         <span>{Math.round(audio.effectsVolume * 100)}%</span>
       </label>
     </div>

@@ -865,6 +865,7 @@
 .volume-control input {
   width: 100%;
   accent-color: #ff4fa3;
+  touch-action: pan-y;
 }
 
 .session-actions {

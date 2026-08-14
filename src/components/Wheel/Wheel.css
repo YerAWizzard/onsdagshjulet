@@ -136,6 +136,7 @@
 }
 
 .wheel-center-trigger {
+  appearance: none;
   position: absolute;
   z-index: 3;
   top: 50%;
@@ -145,23 +146,30 @@
   border: 0;
   border-radius: 50%;
   outline: 0;
+  padding: 0;
   background: radial-gradient(circle at 36% 30%, rgba(255, 255, 255, 0.16), transparent 48%);
   cursor: pointer;
   transform: translate(-50%, -50%);
   transition: transform 170ms ease, box-shadow 170ms ease, filter 170ms ease;
 }
 
+.wheel-center-trigger:hover {
+  outline: 2px dashed rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
+}
+
 .wheel-center-trigger:hover:not(:disabled) {
   box-shadow: 0 0 22px rgba(255, 244, 168, 0.78), 0 0 46px rgba(255, 79, 163, 0.48);
   filter: brightness(1.12);
-  transform: translate(-50%, -50%) scale(1.06);
 }
 
-.wheel-center-trigger:active:not(:disabled) {
-  transform: translate(-50%, -50%) scale(0.95);
+.app-shell .wheel-center-trigger:active:not(:disabled) {
+  transform: translate(-50%, -50%);
 }
 
 .wheel-center-trigger:focus-visible {
+  outline: 3px solid rgba(41, 215, 255, 0.82);
+  outline-offset: 3px;
   box-shadow: 0 0 0 4px rgba(41, 215, 255, 0.72), 0 0 32px rgba(255, 209, 102, 0.8);
 }
 
@@ -548,6 +556,11 @@
 
   .wheel-visual {
     width: min(100%, 680px);
+  }
+
+  .wheel-pointer {
+    transform: translateX(-50%) scale(0.4);
+    transform-origin: 50% 100%;
   }
 
   .spin-button {
