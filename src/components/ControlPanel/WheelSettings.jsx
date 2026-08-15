@@ -98,7 +98,7 @@ function WheelSettings({
                 <input
                   aria-label={t('settings.optionName', { number: index + 1 })}
                   className="option-name"
-                  maxLength={40}
+                  maxLength={80}
                   onChange={(event) => onUpdate(option.id, { label: event.target.value })}
                   value={option.label}
                 />

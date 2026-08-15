@@ -23,6 +23,11 @@ import {
 let optionId = 0
 const COLLAPSED_SECTIONS_KEY = 'onsdagshjulet:collapsed-sections:v1'
 const OPEN_SECTIONS = { settings: false, audio: false, spin: true, session: true, templates: true }
+const MAX_OPTION_LABEL_LENGTH = 80
+
+function togglePendingSelection(current, next, getId = (value) => value) {
+  return getId(current) === getId(next) ? null : next
+}
 
 function loadCollapsedSections() {
   try {
@@ -53,7 +58,7 @@ const DEFAULT_OPTIONS = [
 function hydrateOptions(options) {
   return options.slice(0, 30).map((option) =>
     createOption(
-      String(option.label ?? '').slice(0, 40),
+      String(option.label ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
       Boolean(option.star),
       option.percentage ?? '',
     ),
@@ -132,7 +137,10 @@ function App() {
       id: template.id,
       emoji: template.emoji,
       name: template.name[locale],
-      options: template.options[locale],
+      options: template.options[locale].map((label, index) => ({
+        label,
+        ...(template.optionSettings?.[index] ?? {}),
+      })),
     })),
     [locale],
   )
@@ -174,10 +182,19 @@ function App() {
 
   const confirmTemplate = () => {
     if (!pendingTemplate) return
-    setOptions(pendingTemplate.options.map((label) => createOption(label)))
+    setOptions(pendingTemplate.options.map(({ label, percentage = '', star = false }) =>
+      createOption(label, star, percentage)))
     setSelectedTemplate(pendingTemplate.id)
     setPendingTemplate(null)
     setSessionMessage('')
+  }
+
+  const togglePendingTemplate = (template) => {
+    setPendingTemplate((current) => togglePendingSelection(current, template, (value) => value?.id))
+  }
+
+  const toggleSessionConfirmation = (action) => {
+    setSessionConfirmation((current) => togglePendingSelection(current, action))
   }
 
   const saveCurrentSession = () => {
@@ -206,7 +223,7 @@ function App() {
 
   const handleSaveSession = () => {
     if (canRestore) {
-      setSessionConfirmation('overwrite')
+      toggleSessionConfirmation('overwrite')
       return
     }
     saveCurrentSession()
@@ -343,7 +360,7 @@ function App() {
             <Templates
               onCancel={() => setPendingTemplate(null)}
               onConfirm={confirmTemplate}
-              onSelect={setPendingTemplate}
+              onSelect={togglePendingTemplate}
               pendingTemplate={pendingTemplate}
               selectedTemplate={selectedTemplate}
               t={t}
@@ -358,8 +375,8 @@ function App() {
               confirmation={sessionConfirmation}
               onCancel={() => setSessionConfirmation(null)}
               onConfirm={confirmSessionAction}
-              onDelete={() => setSessionConfirmation('delete')}
-              onRestore={() => setSessionConfirmation('restore')}
+              onDelete={() => toggleSessionConfirmation('delete')}
+              onRestore={() => toggleSessionConfirmation('restore')}
               onSave={handleSaveSession}
               savedAt={savedAt}
               sessionMessage={sessionMessage ? t(`session.${sessionMessage}`) : ''}

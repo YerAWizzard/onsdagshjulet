@@ -320,6 +320,42 @@ export const templateCatalog = [
       en: ['Fancy coffee', 'Fresh flowers', 'Long breakfast', 'Face mask', 'Favorite dessert', 'A new book'],
     },
   },
+  {
+    id: 'creator-favorite', emoji: '⭐',
+    name: { sv: 'Min favorit', en: 'My favorite' },
+    options: {
+      sv: [
+        'Laga något riktigt gott',
+        'Film & soffläge',
+        'KÖPOTEKET!',
+        'GRAND TOUR OF FIKA',
+        'Gå ut och ät – inte en chans att vi lagar mat! 😎',
+        'Kulturpoäng – museum!',
+        'Bio med allt',
+        'Ut i naturen',
+        'Surprise-övernattning!',
+        'Spelkväll',
+        'Spontaniteten flödar – unna dig utan konsekvenstänk 😂',
+      ],
+      en: [
+        'Cook something seriously good',
+        'Movie & couch mode',
+        'KÖPOTEKET!',
+        'GRAND TOUR OF FIKA',
+        "We're eating out – absolutely no cooking tonight! 😎",
+        'Culture points – museum!',
+        'Cinema with everything',
+        'Get out into nature',
+        'Surprise overnight stay!',
+        'Game night',
+        'Spontaneity mode – treat yourself, consequences later 😂',
+      ],
+    },
+    optionSettings: {
+      8: { percentage: '3' },
+      10: { percentage: '0.1', star: true },
+    },
+  },
 ]
 
 export function createTranslator(locale) {

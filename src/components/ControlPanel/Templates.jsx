@@ -28,7 +28,7 @@ function Templates({ help, onCancel, onConfirm, onSelect, pendingTemplate, selec
                   aria-pressed={isActive}
                   className={`template-option template-option--${index}${isActive ? ' is-selected' : ''}`}
                   key={template.id}
-                  onClick={() => onSelect(isPending ? null : template)}
+                  onClick={() => onSelect(template)}
                   type="button"
                 >
                   <span aria-hidden="true">{template.emoji}</span>
