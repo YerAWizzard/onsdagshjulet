@@ -24,6 +24,13 @@ export const MUSIC_TRACKS = {
 }
 
 export const MUSIC_THEMES = Object.keys(MUSIC_TRACKS)
+const MUSIC_VOLUME_FLOOR_DB = -30
+const mapMusicVolume = (volume) => {
+  if (volume <= 0) return 0
+  const decibels = MUSIC_VOLUME_FLOOR_DB * (1 - volume)
+  return 10 ** (decibels / 20)
+}
+
 export const DEFAULT_MUSIC = {
   enabled: false,
   effectsVolume: 0.7,
@@ -61,7 +68,7 @@ export class AudioEngine {
     if (!AudioContextClass) return false
     this.context = new AudioContextClass()
     this.effectsGain = this.context.createGain()
-    this.effectsGain.gain.value = 0.24 * this.effectsVolume
+    this.effectsGain.gain.value = 0.52 * this.effectsVolume
     this.effectsGain.connect(this.context.destination)
     return true
   }
@@ -117,7 +124,7 @@ export class AudioEngine {
     this.volume = Number.isFinite(parsedVolume)
       ? Math.min(Math.max(parsedVolume, 0), 1)
       : DEFAULT_MUSIC.volume
-    this.setMusicPlaybackVolume(this.volume * this.musicDuckFactor)
+    this.setMusicPlaybackVolume(mapMusicVolume(this.volume) * this.musicDuckFactor)
   }
 
   setMusicPlaybackVolume(volume, duration = 0) {
@@ -145,12 +152,12 @@ export class AudioEngine {
 
   duckMusic(factor = 0.85) {
     this.musicDuckFactor = Math.min(1, Math.max(0, Number(factor) || 0))
-    this.setMusicPlaybackVolume(this.volume * this.musicDuckFactor, 140)
+    this.setMusicPlaybackVolume(mapMusicVolume(this.volume) * this.musicDuckFactor, 140)
   }
 
   restoreMusic() {
     this.musicDuckFactor = 1
-    this.setMusicPlaybackVolume(this.volume, 220)
+    this.setMusicPlaybackVolume(mapMusicVolume(this.volume), 220)
   }
 
   setEffectsVolume(volume) {
@@ -159,7 +166,7 @@ export class AudioEngine {
       ? Math.min(Math.max(parsedVolume, 0), 1)
       : DEFAULT_MUSIC.effectsVolume
     if (this.effectsGain) {
-      this.effectsGain.gain.setTargetAtTime(0.24 * this.effectsVolume, this.context.currentTime, 0.015)
+      this.effectsGain.gain.setTargetAtTime(0.52 * this.effectsVolume, this.context.currentTime, 0.015)
     }
   }
 
@@ -181,16 +188,16 @@ export class AudioEngine {
   }
 
   playTick() {
-    this.tone(920, 0.03, 'square', 0.07)
+    this.tone(920, 0.03, 'square', 0.735)
   }
 
   playCountdown(isFinal = false) {
     if (isFinal) {
-      this.tone(784, 0.18, 'triangle', 0.18)
-      this.tone(1046.5, 0.24, 'triangle', 0.16, 0.075)
+      this.tone(784, 0.18, 'triangle', 1.9845)
+      this.tone(1046.5, 0.24, 'triangle', 1.764, 0.075)
       return
     }
-    this.tone(440, 0.13, 'triangle', 0.15)
+    this.tone(440, 0.13, 'triangle', 1.65375)
   }
 
   playWin(isStarPrize) {
@@ -202,7 +209,7 @@ export class AudioEngine {
         note,
         isStarPrize ? 0.62 : 0.42,
         isStarPrize ? 'triangle' : 'sine',
-        isStarPrize ? 0.25 : 0.18,
+        isStarPrize ? 1.56 : 0.966,
         index * (isStarPrize ? 0.085 : 0.1),
       )
     })
