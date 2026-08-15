@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
+import AboutPopover from './components/AboutPopover.jsx'
 import CollapsibleSection from './components/ControlPanel/CollapsibleSection.jsx'
 import AudioSettings from './components/ControlPanel/AudioSettings.jsx'
 import SessionControls from './components/ControlPanel/SessionControls.jsx'
@@ -11,6 +12,7 @@ import { createTranslator, templateCatalog } from './i18n.js'
 import { AudioEngine, DEFAULT_MUSIC, MUSIC_TRACKS } from './lib/AudioEngine.js'
 import { loadMusicPreferences, saveMusicPreferences } from './lib/musicStorage.js'
 import { calculateProbabilities } from './lib/probability.js'
+import { APP_VERSION } from './version.js'
 import {
   deleteSession,
   hasSavedSession,
@@ -192,7 +194,6 @@ function App() {
       locale,
       options: options.map(({ label, percentage, star }) => ({ label, percentage, star })),
       selectedMusic: audio.mode,
-      selectedTemplate,
       savedAt: nextSavedAt,
       spinSettings,
       volume: audio.volume,
@@ -221,7 +222,8 @@ function App() {
       return
     }
     setOptions(hydrateOptions(session.options))
-    setSelectedTemplate(session.selectedTemplate ?? null)
+    setSelectedTemplate(null)
+    setPendingTemplate(null)
     setLocale(session.locale === 'en' ? 'en' : 'sv')
     const restoredAudio = {
       enabled: Boolean(session.audio?.enabled),
@@ -272,7 +274,7 @@ function App() {
 
       <main className="workspace">
         <header className="app-header">
-          <div className="language-switch" aria-label="Language / Språk">
+          <div className="language-switch" aria-label={t('headerControlsLabel')}>
             <button
               aria-label="🇸🇪 Svenska"
               aria-pressed={locale === 'sv'}
@@ -293,6 +295,7 @@ function App() {
               <span className="language-flag language-flag--en" aria-hidden="true" />
               <span>English</span>
             </button>
+            <AboutPopover t={t} version={APP_VERSION} />
           </div>
           <div className="brand-line">
             <h1><span aria-hidden="true">🎪</span> Onsdagshjulet</h1>
@@ -378,7 +381,7 @@ function App() {
       </main>
 
       <footer className="app-footer" aria-label={t('footer.label')}>
-        <span>{t('footer.version')}</span>
+        <span>{t('footer.version', { version: APP_VERSION })}</span>
         <span>{t('footer.storage')}</span>
       </footer>
     </div>

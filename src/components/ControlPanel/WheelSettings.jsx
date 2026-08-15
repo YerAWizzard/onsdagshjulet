@@ -50,7 +50,7 @@ function WheelSettings({
 
   const saveProbability = (option) => {
     if (!probabilityEditor || probabilityEditor.id !== option.id) return
-    const normalizedValue = probabilityEditor.draft.replace(',', '.')
+    const normalizedValue = String(Number(probabilityEditor.draft.replace(',', '.')))
     const previousValue = String(option.percentage ?? '').replace(',', '.')
     if (normalizedValue !== previousValue) onUpdate(option.id, { percentage: normalizedValue })
     setProbabilityEditor(null)
@@ -153,19 +153,16 @@ function WheelSettings({
                       ref={probabilityInputRef}
                       aria-invalid={Boolean(editorError)}
                       aria-label={t('settings.optionPercentage', { number: index + 1 })}
+                      autoComplete="off"
                       inputMode="decimal"
-                      max="100"
-                      min="0"
                       onChange={(event) => updateProbabilityDraft(event.target.value)}
                       onKeyDown={(event) => {
-                        if (['e', 'E', '+', '-'].includes(event.key)) event.preventDefault()
                         if (event.key === 'Enter') {
                           event.preventDefault()
                           if (!draftError) saveProbability(option)
                         }
                       }}
-                      step="0.1"
-                      type="number"
+                      type="text"
                       value={probabilityEditor.draft}
                     />
                     <span aria-hidden="true">%</span>

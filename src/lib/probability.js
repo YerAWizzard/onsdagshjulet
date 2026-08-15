@@ -66,5 +66,5 @@ export function pickWeightedIndex(probabilities, randomValue = Math.random()) {
 }
 
 export function formatProbability(value) {
-  return `${value.toFixed(value < 10 ? 1 : 0)}%`
+  return `${Number(value.toFixed(1))}%`
 }

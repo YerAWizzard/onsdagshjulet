@@ -20,17 +20,22 @@ function Templates({ help, onCancel, onConfirm, onSelect, pendingTemplate, selec
       <div className="template-list">
         {templateRows.map((row) => (
           <div className="template-row" key={row.map((template) => template.id).join('-')}>
-            {row.map((template, index) => (
-              <button
-                className={`template-option template-option--${index}${selectedTemplate === template.id ? ' is-selected' : ''}`}
-                key={template.id}
-                onClick={() => onSelect(template)}
-                type="button"
-              >
-                <span aria-hidden="true">{template.emoji}</span>
-                <span>{template.name}</span>
-              </button>
-            ))}
+            {row.map((template, index) => {
+              const isPending = pendingTemplate?.id === template.id
+              const isActive = isPending || (!pendingTemplate && selectedTemplate === template.id)
+              return (
+                <button
+                  aria-pressed={isActive}
+                  className={`template-option template-option--${index}${isActive ? ' is-selected' : ''}`}
+                  key={template.id}
+                  onClick={() => onSelect(isPending ? null : template)}
+                  type="button"
+                >
+                  <span aria-hidden="true">{template.emoji}</span>
+                  <span>{template.name}</span>
+                </button>
+              )
+            })}
             {row.some((template) => template.id === pendingTemplate?.id) ? (
               <div
                 ref={confirmationRef}

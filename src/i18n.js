@@ -3,6 +3,7 @@ export const translations = {
     languageName: 'Svenska',
     headerTitle: 'Gör vardagen lite roligare.',
     subtitle: 'Kan ni inte bestämma er? Låt Onsdagshjulet välja.',
+    headerControlsLabel: 'Språk och information',
     controlsLabel: 'Hjulreglage',
     settings: {
       title: 'Lägg till dina val',
@@ -52,7 +53,7 @@ export const translations = {
       trackStatus: '{{theme}} {{current}} av {{total}}',
     },
     session: {
-      title: 'Spara dina val lokalt',
+      title: 'Spara dina inställningar lokalt',
       help: 'Spara hjulets nuvarande val och inställningar på den här enheten och återställ dem senare.',
       save: 'Spara',
       restore: 'Återställ',
@@ -117,8 +118,16 @@ export const translations = {
     },
     footer: {
       label: 'Programstatus',
-      version: 'Onsdagshjulet – Version 2.1',
+      version: 'Onsdagshjulet – Version {{version}}',
       storage: 'Dina val sparas bara på den här enheten. Inget konto behövs.',
+    },
+    about: {
+      open: 'Om Onsdagshjulet',
+      title: 'Om Onsdagshjulet',
+      paragraph1: 'Jag kollade runt på olika snurrhjul på nätet, men tyckte att de flesta var lite väl… tråkiga.',
+      paragraph2: 'Jag ville ha något med mer känsla, mer show och lite mer deluxe – utan att allt behöver vara så seriöst.',
+      paragraph3: 'Vi har ofta svårt att bestämma vad vi ska hitta på. Därför får Onsdagshjulet låta slumpen välja – från middag och utflykter till spontana små äventyr. Ibland behöver vardagen helt enkelt lite mer show.',
+      version: 'Version {{version}}',
     },
     probability: {
       atLeastTwo: 'Lägg till minst två val.',
@@ -133,6 +142,7 @@ export const translations = {
     languageName: 'English',
     headerTitle: 'Make everyday life a little more fun.',
     subtitle: 'Can’t decide? Let Onsdagshjulet choose.',
+    headerControlsLabel: 'Language and information',
     controlsLabel: 'Wheel controls',
     settings: {
       title: 'Add your choices',
@@ -182,7 +192,7 @@ export const translations = {
       trackStatus: '{{theme}} {{current}} of {{total}}',
     },
     session: {
-      title: 'Save your choices locally',
+      title: 'Save your settings locally',
       help: 'Save the wheel’s current choices and settings on this device and restore them later.',
       save: 'Save',
       restore: 'Restore',
@@ -247,8 +257,16 @@ export const translations = {
     },
     footer: {
       label: 'Application status',
-      version: 'Onsdagshjulet – Version 2.1',
+      version: 'Onsdagshjulet – Version {{version}}',
       storage: 'Your choices are saved only on this device. No account needed.',
+    },
+    about: {
+      open: 'About Onsdagshjulet',
+      title: 'About Onsdagshjulet',
+      paragraph1: 'I looked around at different spin-the-wheel sites online, but most of them felt a little too… boring.',
+      paragraph2: 'I wanted something with more personality, more show, and a little more deluxe – without taking everything so seriously.',
+      paragraph3: 'We’re also terrible at deciding what to actually do. So Onsdagshjulet lets chance choose – from dinner and outings to spontaneous little adventures. Sometimes everyday life simply needs a little more show.',
+      version: 'Version {{version}}',
     },
     probability: {
       atLeastTwo: 'Add at least two options.',
