@@ -6,7 +6,7 @@ const CONFETTI = Array.from({ length: 34 }, (_, index) => ({
   rotation: `${(index * 47) % 180}deg`,
 }))
 
-function WheelResult({ t, winner }) {
+function WheelResult({ onDone, onSpinAgain, showSubWheelActions, t, winner }) {
   return (
     <div
       className={`wheel-result${winner?.star ? ' wheel-result--star' : ''}${winner ? ' wheel-result--winner' : ''}`}
@@ -34,6 +34,16 @@ function WheelResult({ t, winner }) {
             {winner.star ? t('wheel.starPrize') : t('wheel.winner')}
           </span>
           <strong>{winner.label}</strong>
+          {showSubWheelActions ? (
+            <div className="wheel-result__actions">
+              <button className="wheel-result__continue" onClick={onSpinAgain} type="button">
+                {t('wheel.spinAgain')}
+              </button>
+              <button className="wheel-result__done" onClick={onDone} type="button">
+                {t('wheel.done')}
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="wheel-result__placeholder">

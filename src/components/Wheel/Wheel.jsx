@@ -16,13 +16,14 @@ const BULBS = Array.from({ length: 44 }, (_, index) => ({
   delay: `${(index % 7) * 0.07}s`,
 }))
 
-function Wheel({ audioEngine, options, probabilities, probabilityError, spinSettings, t }) {
+function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilityError, spinSettings, t }) {
   const wheelRef = useRef(null)
   const countdownTimersRef = useRef([])
   const [isSpinning, setIsSpinning] = useState(false)
   const [isCountingDown, setIsCountingDown] = useState(false)
   const [countdownText, setCountdownText] = useState('')
   const [winner, setWinner] = useState(null)
+  const [winnerActionsDismissed, setWinnerActionsDismissed] = useState(false)
 
   const wheelItems = useMemo(
     () => options.map((option, index) => ({ ...option, id: index })),
@@ -31,6 +32,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
 
   useEffect(() => {
     setWinner(null)
+    setWinnerActionsDismissed(false)
   }, [options])
 
   useEffect(() => () => {
@@ -52,6 +54,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
   const handleSpin = useCallback(() => {
     if (isCountingDown || isSpinning || probabilityError) return
     setWinner(null)
+    setWinnerActionsDismissed(false)
     setIsCountingDown(true)
     const winnerIndex = pickWeightedIndex(probabilities)
     const spinDuration = getRandomSpinDuration(
@@ -138,7 +141,13 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
         {t('wheel.spin')}
       </button>
 
-      <WheelResult t={t} winner={winner} />
+      <WheelResult
+        onDone={() => setWinnerActionsDismissed(true)}
+        onSpinAgain={onOpenSubWheel ? () => onOpenSubWheel(winner) : null}
+        showSubWheelActions={Boolean(winner?.subWheel) && !winnerActionsDismissed && Boolean(onOpenSubWheel)}
+        t={t}
+        winner={winner}
+      />
     </div>
   )
 }

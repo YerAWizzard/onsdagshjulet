@@ -37,12 +37,56 @@ function loadCollapsedSections() {
   }
 }
 
-const createOption = (label, star = false, percentage = '') => ({
+const createOption = (label, star = false, percentage = '', subWheel = null) => ({
   id: `option-${optionId += 1}`,
   label,
   percentage,
   star,
+  ...(subWheel ? { subWheel } : {}),
 })
+
+function hydrateSubWheel(subWheel) {
+  if (!subWheel || !Array.isArray(subWheel.options)) return null
+  return {
+    id: String(subWheel.id ?? `sub-wheel-${Date.now()}-${Math.random()}`),
+    title: String(subWheel.title ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
+    options: subWheel.options.slice(0, 30).map((option) => createOption(
+      String(option.label ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
+      false,
+      '',
+      hydrateSubWheel(option.subWheel),
+    )),
+  }
+}
+
+function serializeSubWheel(subWheel) {
+  if (!subWheel) return null
+  return {
+    id: subWheel.id,
+    title: subWheel.title,
+    options: subWheel.options.map(({ label, subWheel: nestedSubWheel }) => ({
+      label,
+      ...(nestedSubWheel ? { subWheel: serializeSubWheel(nestedSubWheel) } : {}),
+    })),
+  }
+}
+
+function localizeSubWheel(subWheel, locale) {
+  if (!subWheel) return null
+  return {
+    id: subWheel.id,
+    title: subWheel.title[locale],
+    options: subWheel.options[locale].map((label, index) => {
+      const optionSettings = subWheel.optionSettings?.[index] ?? {}
+      const nestedSubWheel = localizeSubWheel(optionSettings.subWheel, locale)
+      return {
+        label,
+        ...optionSettings,
+        ...(nestedSubWheel ? { subWheel: nestedSubWheel } : {}),
+      }
+    }),
+  }
+}
 
 const DEFAULT_OPTIONS = [
   createOption('Pizza'),
@@ -61,6 +105,7 @@ function hydrateOptions(options) {
       String(option.label ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
       Boolean(option.star),
       option.percentage ?? '',
+      hydrateSubWheel(option.subWheel),
     ),
   )
 }
@@ -79,6 +124,7 @@ function App() {
   const [locale, setLocale] = useState('sv')
   const [collapsedSections, setCollapsedSections] = useState(loadCollapsedSections)
   const [options, setOptions] = useState(DEFAULT_OPTIONS)
+  const [runtimePath, setRuntimePath] = useState([])
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [pendingTemplate, setPendingTemplate] = useState(null)
   const [inspirationIndex] = useState(() => Math.floor(Math.random() * 5) + 1)
@@ -140,28 +186,30 @@ function App() {
       options: template.options[locale].map((label, index) => ({
         label,
         ...(template.optionSettings?.[index] ?? {}),
+        subWheel: localizeSubWheel(template.optionSettings?.[index]?.subWheel, locale),
       })),
     })),
     [locale],
   )
 
-  const probabilityResult = useMemo(() => calculateProbabilities(options), [options])
-  const localizedProbabilityError = probabilityResult.errorCode
-    ? t(`probability.${probabilityResult.errorCode}`, probabilityResult.errorParams)
-    : probabilityResult.error
-
+  const activeRuntimeWheel = runtimePath[runtimePath.length - 1] ?? null
+  const activeOptions = activeRuntimeWheel?.options ?? options
+  const probabilityResult = useMemo(() => calculateProbabilities(activeOptions), [activeOptions])
+  const rootProbabilityResult = useMemo(() => calculateProbabilities(options), [options])
   const updateOption = (id, updates) => {
     setOptions((current) => current.map((option) => (option.id === id ? { ...option, ...updates } : option)))
     setSelectedTemplate(null)
   }
 
   const addOption = () => {
-    setOptions((current) => (current.length >= 30 ? current : [...current, createOption(`${locale === 'sv' ? 'Val' : 'Option'} ${current.length + 1}`)]))
+    const addToOptions = (current) => (current.length >= 30 ? current : [...current, createOption(`${locale === 'sv' ? 'Val' : 'Option'} ${current.length + 1}`)])
+    setOptions(addToOptions)
     setSelectedTemplate(null)
   }
 
   const removeOption = (id) => {
-    setOptions((current) => (current.length <= 2 ? current : current.filter((option) => option.id !== id)))
+    const removeFromOptions = (current) => (current.length <= 2 ? current : current.filter((option) => option.id !== id))
+    setOptions(removeFromOptions)
     setSelectedTemplate(null)
   }
 
@@ -182,8 +230,9 @@ function App() {
 
   const confirmTemplate = () => {
     if (!pendingTemplate) return
-    setOptions(pendingTemplate.options.map(({ label, percentage = '', star = false }) =>
-      createOption(label, star, percentage)))
+    setOptions(pendingTemplate.options.map(({ label, percentage = '', star = false, subWheel }) =>
+      createOption(label, star, percentage, hydrateSubWheel(subWheel))))
+    setRuntimePath([])
     setSelectedTemplate(pendingTemplate.id)
     setPendingTemplate(null)
     setSessionMessage('')
@@ -209,7 +258,12 @@ function App() {
         volume: audio.volume,
       },
       locale,
-      options: options.map(({ label, percentage, star }) => ({ label, percentage, star })),
+      options: options.map(({ label, percentage, star, subWheel }) => ({
+        label,
+        percentage,
+        star,
+        ...(subWheel ? { subWheel: serializeSubWheel(subWheel) } : {}),
+      })),
       selectedMusic: audio.mode,
       savedAt: nextSavedAt,
       spinSettings,
@@ -239,6 +293,7 @@ function App() {
       return
     }
     setOptions(hydrateOptions(session.options))
+    setRuntimePath([])
     setSelectedTemplate(null)
     setPendingTemplate(null)
     setLocale(session.locale === 'en' ? 'en' : 'sv')
@@ -331,12 +386,15 @@ function App() {
             title={t('settings.title')}
           >
             <WheelSettings
+              allowSubWheels
               onAdd={addOption}
               onRemove={removeOption}
               onUpdate={updateOption}
               options={options}
-              probabilities={probabilityResult.probabilities}
-              probabilityError={localizedProbabilityError}
+              probabilities={rootProbabilityResult.probabilities}
+              probabilityError={rootProbabilityResult.errorCode
+                ? t(`probability.${rootProbabilityResult.errorCode}`, rootProbabilityResult.errorParams)
+                : rootProbabilityResult.error}
               t={t}
             />
           </CollapsibleSection>
@@ -386,9 +444,33 @@ function App() {
         </aside>
 
         <section className="wheel-card" aria-label={t('wheel.label')}>
+          {activeRuntimeWheel ? (
+            <nav className="wheel-context" aria-label={runtimePath.map((entry) => entry.parentLabel).join(' › ')}>
+              <span className="wheel-context__title">
+                {runtimePath.map((entry, index) => (
+                  <span className="wheel-context__crumb" key={entry.pathId}>
+                    {index ? <span aria-hidden="true">›</span> : null}
+                    <strong>{entry.parentLabel}</strong>
+                  </span>
+                ))}
+              </span>
+              <button className="wheel-context__back" onClick={() => setRuntimePath((current) => current.slice(0, -1))} type="button">
+                <span aria-hidden="true">←</span> {t(runtimePath.length === 1 ? 'wheel.backToMain' : 'wheel.back')}
+              </button>
+            </nav>
+          ) : null}
           <Wheel
+            key={activeRuntimeWheel?.pathId ?? 'root'}
             audioEngine={audioEngineRef.current}
-            options={options}
+            onOpenSubWheel={runtimePath.length < 2 ? (winner) => {
+              const nextWheel = hydrateSubWheel(winner.subWheel)
+              setRuntimePath((current) => [...current, {
+                ...nextWheel,
+                parentLabel: winner.label,
+                pathId: `${nextWheel.id}-${current.length}-${Date.now()}`,
+              }])
+            } : null}
+            options={activeOptions}
             probabilities={probabilityResult.probabilities}
             probabilityError={probabilityResult.error}
             spinSettings={spinSettings}
