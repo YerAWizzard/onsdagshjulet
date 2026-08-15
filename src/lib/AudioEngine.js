@@ -51,6 +51,10 @@ export class AudioEngine {
     this.music.volume = this.volume
   }
 
+  activate() {
+    this.isDestroyed = false
+  }
+
   ensureContext() {
     if (this.context) return true
     const AudioContextClass = window.AudioContext || window.webkitAudioContext
@@ -113,7 +117,7 @@ export class AudioEngine {
     this.volume = Number.isFinite(parsedVolume)
       ? Math.min(Math.max(parsedVolume, 0), 1)
       : DEFAULT_MUSIC.volume
-    this.setMusicPlaybackVolume(this.volume * this.musicDuckFactor, 90)
+    this.setMusicPlaybackVolume(this.volume * this.musicDuckFactor)
   }
 
   setMusicPlaybackVolume(volume, duration = 0) {

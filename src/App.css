@@ -1365,6 +1365,7 @@
   }
 
   .wheel-card {
+    margin-top: 24px;
     min-height: 560px;
   }
 

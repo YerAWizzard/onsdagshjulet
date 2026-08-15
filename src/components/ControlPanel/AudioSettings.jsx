@@ -41,7 +41,7 @@ function AudioSettings({ audio, onChange, t }) {
       </div>
       <label className="volume-control">
         <span>{t('audio.volume')}</span>
-        <input aria-label={t('audio.volume')} max="100" min="0" onChange={updateMusicVolume} onInput={updateMusicVolume} type="range" value={Math.round(audio.volume * 100)} />
+        <input aria-label={t('audio.volume')} max="100" min="0" onInput={updateMusicVolume} onPointerCancel={updateMusicVolume} onPointerUp={updateMusicVolume} type="range" value={Math.round(audio.volume * 100)} />
         <span>{Math.round(audio.volume * 100)}%</span>
       </label>
       <label className="volume-control">

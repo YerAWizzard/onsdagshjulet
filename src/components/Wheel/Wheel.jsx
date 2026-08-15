@@ -4,7 +4,10 @@ import { getRandomSpinDuration } from './WheelPhysics.js'
 import WheelCanvas from './WheelCanvas.jsx'
 import WheelPointer from './WheelPointer.jsx'
 import WheelResult from './WheelResult.jsx'
-import { FESTIVAL_PALETTE } from './WheelRenderer.js'
+import {
+  FESTIVAL_PALETTE,
+  WHEEL_OUTER_RADIUS_RATIO,
+} from './WheelRenderer.js'
 import './Wheel.css'
 
 const BULBS = Array.from({ length: 44 }, (_, index) => ({
@@ -94,7 +97,12 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
             />
           ))}
         </div>
-        <div className="wheel-canvas-wrap">
+        <div
+          className="wheel-canvas-wrap"
+          style={{
+            '--wheel-segment-edge': `${(0.5 - WHEEL_OUTER_RADIUS_RATIO) * 100}%`,
+          }}
+        >
           <WheelCanvas
             ref={wheelRef}
             items={wheelItems}
@@ -103,6 +111,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
             onSpinStateChange={setIsSpinning}
             onTick={() => audioEngine.playTick()}
           />
+          <WheelPointer isSpinning={isSpinning} />
         </div>
         <button
           aria-busy={isBusy}
@@ -112,7 +121,6 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
           onClick={handleSpin}
           type="button"
         />
-        <WheelPointer isSpinning={isSpinning} />
         {isCountingDown ? (
           <div className={`wheel-countdown${countdownText === '1' ? ' wheel-countdown--final-number' : ''}`} key={countdownText} aria-live="assertive">
             <strong>{countdownText}</strong>

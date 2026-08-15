@@ -8,6 +8,7 @@ import {
 import {
   createVisualOrder,
   drawWheel,
+  WHEEL_OUTER_RADIUS_RATIO,
   WHEEL_SIZE,
 } from './WheelRenderer.js'
 import {
@@ -77,7 +78,13 @@ const WheelCanvas = forwardRef(function WheelCanvas(
       context.clip('evenodd')
       context.beginPath()
       context.moveTo(center, center)
-      context.arc(center, center, size * 0.465, start, start + step)
+      context.arc(
+        center,
+        center,
+        size * WHEEL_OUTER_RADIUS_RATIO,
+        start,
+        start + step,
+      )
       context.closePath()
       context.fillStyle = celebration.isStarPrize
         ? `rgba(255, 238, 138, ${0.16 + Math.max(0, pulse) * 0.28})`

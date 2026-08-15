@@ -10,10 +10,13 @@
 }
 
 .wheel-visual {
+  --wheel-outer-ring-width: 26px;
+  --wheel-pointer-scale: 1;
+
   position: relative;
   width: min(100%, 720px);
   aspect-ratio: 1;
-  padding: 26px;
+  padding: var(--wheel-outer-ring-width);
   border-radius: 50%;
   background: linear-gradient(145deg, #ff4fa3, #ffd166 34%, #29d7ff 68%, #8b5cf6);
   box-shadow:
@@ -54,7 +57,7 @@
 
 .wheel-canvas-wrap {
   position: absolute;
-  inset: 26px;
+  inset: var(--wheel-outer-ring-width);
   border-radius: 50%;
   overflow: visible;
 }
@@ -91,13 +94,13 @@
 .wheel-pointer {
   position: absolute;
   z-index: 4;
-  top: 5px;
+  top: var(--wheel-segment-edge);
   left: 50%;
   width: 76px;
   height: 88px;
   filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.5));
-  transform: translateX(-50%);
-  transform-origin: 50% 0;
+  transform: translate(-50%, -60%) scale(var(--wheel-pointer-scale));
+  transform-origin: 50% 60%;
 }
 
 .wheel-pointer::before {
@@ -556,11 +559,11 @@
 
   .wheel-visual {
     width: min(100%, 680px);
+    margin-top: 24px;
   }
 
   .wheel-pointer {
-    transform: translateX(-50%) scale(0.4);
-    transform-origin: 50% 100%;
+    --wheel-pointer-scale: 0.4;
   }
 
   .spin-button {

@@ -90,6 +90,7 @@ function App() {
   useEffect(() => {
     const engine = audioEngineRef.current
     const initialAudio = initialAudioRef.current
+    engine.activate()
     engine.setMode(initialAudio.mode)
     engine.setTrack(initialAudio.trackIndex)
     engine.setVolume(initialAudio.volume)
@@ -155,10 +156,12 @@ function App() {
   }
 
   const updateAudio = (updates) => {
+    if ('volume' in updates) {
+      audioEngineRef.current.setVolume(updates.volume)
+    }
     setAudio((current) => {
       const next = { ...current, ...updates }
       if ('mode' in updates && updates.mode !== current.mode) next.trackIndex = 0
-      if ('volume' in updates) audioEngineRef.current.setVolume(next.volume)
       if ('effectsVolume' in updates) audioEngineRef.current.setEffectsVolume(next.effectsVolume)
       if ('mode' in updates) audioEngineRef.current.setMode(next.mode)
       if ('trackIndex' in updates) audioEngineRef.current.setTrack(next.trackIndex)

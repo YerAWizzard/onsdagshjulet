@@ -1,4 +1,5 @@
 export const WHEEL_SIZE = 900
+export const WHEEL_OUTER_RADIUS_RATIO = 0.465
 
 export const FESTIVAL_PALETTE = [
   '#FF4FA3',
@@ -83,7 +84,7 @@ export function drawWheel(context, items, visualOrder) {
   const size = WHEEL_SIZE
   const centerX = size / 2
   const centerY = size / 2
-  const outerRadius = size * 0.465
+  const outerRadius = size * WHEEL_OUTER_RADIUS_RATIO
   const innerRadius = size * 0.105
   const segmentCount = visualOrder.length
   const step = (Math.PI * 2) / segmentCount
