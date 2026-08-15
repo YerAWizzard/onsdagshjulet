@@ -117,7 +117,7 @@ export const translations = {
     },
     footer: {
       label: 'Programstatus',
-      version: 'Onsdagshjulet – Version 1',
+      version: 'Onsdagshjulet – Version 2.1',
       storage: 'Dina val sparas bara på den här enheten. Inget konto behövs.',
     },
     probability: {
@@ -247,7 +247,7 @@ export const translations = {
     },
     footer: {
       label: 'Application status',
-      version: 'Onsdagshjulet – Version 1',
+      version: 'Onsdagshjulet – Version 2.1',
       storage: 'Your choices are saved only on this device. No account needed.',
     },
     probability: {

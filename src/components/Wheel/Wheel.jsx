@@ -43,7 +43,7 @@ function Wheel({ audioEngine, options, probabilities, probabilityError, spinSett
       const winningOption = options[winnerIndex]
       const result = { ...winningOption, winId: `${Date.now()}-${Math.random()}` }
       setWinner(result)
-      audioEngine.restoreMusic()
+      audioEngine.restoreMusic(2000)
       audioEngine.playWin(result.star)
     },
     [audioEngine, options],

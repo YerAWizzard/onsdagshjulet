@@ -30,6 +30,14 @@ const mapMusicVolume = (volume) => {
   const decibels = MUSIC_VOLUME_FLOOR_DB * (1 - volume)
   return 10 ** (decibels / 20)
 }
+const mapDuckedMusicVolume = (volume) => {
+  if (volume <= 0) return 0
+  if (volume <= 0.1) return volume * 0.8
+  if (volume <= 0.2) return 0.08 + (volume - 0.1) * 0.4
+  if (volume <= 0.3) return 0.12 + (volume - 0.2) * 0.3
+  if (volume <= 0.6) return volume * 0.5
+  return volume - 0.3
+}
 
 export const DEFAULT_MUSIC = {
   enabled: false,
@@ -48,8 +56,9 @@ export class AudioEngine {
     this.mode = DEFAULT_MUSIC.mode
     this.trackIndex = DEFAULT_MUSIC.trackIndex
     this.volume = DEFAULT_MUSIC.volume
-    this.musicDuckFactor = 1
+    this.isMusicDucked = false
     this.volumeAnimationFrame = null
+    this.musicRestoreTimeout = null
     this.isDestroyed = false
     this.hasInteracted = false
     this.music = new Audio(MUSIC_TRACKS[this.mode][this.trackIndex])
@@ -124,7 +133,8 @@ export class AudioEngine {
     this.volume = Number.isFinite(parsedVolume)
       ? Math.min(Math.max(parsedVolume, 0), 1)
       : DEFAULT_MUSIC.volume
-    this.setMusicPlaybackVolume(mapMusicVolume(this.volume) * this.musicDuckFactor)
+    const playbackVolume = this.isMusicDucked ? mapDuckedMusicVolume(this.volume) : this.volume
+    this.setMusicPlaybackVolume(mapMusicVolume(playbackVolume))
   }
 
   setMusicPlaybackVolume(volume, duration = 0) {
@@ -150,14 +160,26 @@ export class AudioEngine {
     this.volumeAnimationFrame = requestAnimationFrame(animateVolume)
   }
 
-  duckMusic(factor = 0.85) {
-    this.musicDuckFactor = Math.min(1, Math.max(0, Number(factor) || 0))
-    this.setMusicPlaybackVolume(mapMusicVolume(this.volume) * this.musicDuckFactor, 140)
+  duckMusic() {
+    if (this.musicRestoreTimeout) clearTimeout(this.musicRestoreTimeout)
+    this.musicRestoreTimeout = null
+    this.isMusicDucked = true
+    this.setMusicPlaybackVolume(mapMusicVolume(mapDuckedMusicVolume(this.volume)), 450)
   }
 
-  restoreMusic() {
-    this.musicDuckFactor = 1
-    this.setMusicPlaybackVolume(mapMusicVolume(this.volume), 220)
+  restoreMusic(delay = 0) {
+    if (this.musicRestoreTimeout) clearTimeout(this.musicRestoreTimeout)
+    this.musicRestoreTimeout = null
+    const restore = () => {
+      this.musicRestoreTimeout = null
+      this.isMusicDucked = false
+      this.setMusicPlaybackVolume(mapMusicVolume(this.volume), 800)
+    }
+    if (delay > 0) {
+      this.musicRestoreTimeout = setTimeout(restore, delay)
+      return
+    }
+    restore()
   }
 
   setEffectsVolume(volume) {
@@ -217,9 +239,11 @@ export class AudioEngine {
 
   destroy() {
     this.isDestroyed = true
+    if (this.musicRestoreTimeout) clearTimeout(this.musicRestoreTimeout)
+    this.musicRestoreTimeout = null
     if (this.volumeAnimationFrame) cancelAnimationFrame(this.volumeAnimationFrame)
     this.volumeAnimationFrame = null
-    this.musicDuckFactor = 1
+    this.isMusicDucked = false
     this.music.pause()
     this.music.removeAttribute('src')
     this.music.load()
