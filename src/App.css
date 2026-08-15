@@ -11,7 +11,7 @@
   width: min(100%, 1600px);
   min-height: 100svh;
   margin: 0 auto;
-  padding: 0.4rem clamp(1rem, 2.5vw, 2.75rem) 1rem;
+  padding: 10px clamp(1rem, 2.5vw, 2.75rem) 1rem;
   overflow: hidden;
 }
 
@@ -1246,8 +1246,9 @@
   .sidebar {
     grid-column: 1;
     grid-row: 2 / 5;
-    height: calc(100svh - 5rem);
-    max-height: calc(100svh - 5rem);
+    height: calc(100svh - 5rem - 16px);
+    max-height: calc(100svh - 5rem - 16px);
+    margin-top: 16px;
   }
 
   .wheel-card {

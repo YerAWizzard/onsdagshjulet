@@ -352,7 +352,7 @@ export const templateCatalog = [
       ],
     },
     optionSettings: {
-      8: { percentage: '3' },
+      8: { percentage: '3', star: true },
       10: { percentage: '0.1', star: true },
     },
   },
