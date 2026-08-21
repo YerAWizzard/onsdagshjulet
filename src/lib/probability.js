@@ -3,6 +3,14 @@ export function calculateProbabilities(options) {
     return { error: 'Add at least two options.', errorCode: 'atLeastTwo', probabilities: [] }
   }
 
+  if (options.filter((option) => String(option.label ?? '').trim()).length < 2) {
+    return {
+      error: 'A wheel needs at least two named choices.',
+      errorCode: 'atLeastTwoValid',
+      probabilities: [],
+    }
+  }
+
   let explicitTotal = 0
   const automaticIndexes = []
   const probabilities = options.map((option, index) => {

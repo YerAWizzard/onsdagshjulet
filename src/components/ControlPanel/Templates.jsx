@@ -4,8 +4,8 @@ import { scrollIntoSidebarView } from './scrollIntoSidebarView.js'
 function Templates({ help, onCancel, onConfirm, onSelect, pendingTemplate, selectedTemplate, t, templates }) {
   const confirmationRef = useRef(null)
   const templateRows = []
-  for (let index = 0; index < templates.length; index += 2) {
-    templateRows.push(templates.slice(index, index + 2))
+  for (let index = 0; index < templates.length; index += 3) {
+    templateRows.push(templates.slice(index, index + 3))
   }
 
   useEffect(() => {

@@ -52,8 +52,8 @@ function hydrateSubWheel(subWheel) {
     title: String(subWheel.title ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
     options: subWheel.options.slice(0, 30).map((option) => createOption(
       String(option.label ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
-      false,
-      '',
+      Boolean(option.star),
+      option.percentage ?? '',
       hydrateSubWheel(option.subWheel),
     )),
   }
@@ -64,8 +64,10 @@ function serializeSubWheel(subWheel) {
   return {
     id: subWheel.id,
     title: subWheel.title,
-    options: subWheel.options.map(({ label, subWheel: nestedSubWheel }) => ({
+    options: subWheel.options.map(({ label, percentage = '', star = false, subWheel: nestedSubWheel }) => ({
       label,
+      percentage,
+      star,
       ...(nestedSubWheel ? { subWheel: serializeSubWheel(nestedSubWheel) } : {}),
     })),
   }
@@ -381,6 +383,7 @@ function App() {
             accentClass="card-accent--pink"
             className="settings-card"
             collapsed={collapsedSections.settings}
+            icon="choices"
             id="wheel-settings"
             onToggle={() => toggleSection('settings')}
             title={t('settings.title')}
@@ -391,7 +394,6 @@ function App() {
               onRemove={removeOption}
               onUpdate={updateOption}
               options={options}
-              probabilities={rootProbabilityResult.probabilities}
               probabilityError={rootProbabilityResult.errorCode
                 ? t(`probability.${rootProbabilityResult.errorCode}`, rootProbabilityResult.errorParams)
                 : rootProbabilityResult.error}
@@ -399,11 +401,11 @@ function App() {
             />
           </CollapsibleSection>
 
-          <CollapsibleSection accentClass="card-accent--blue" className="audio-card" collapsed={collapsedSections.audio} id="audio-settings" onToggle={() => toggleSection('audio')} title={t('audio.title')}>
+          <CollapsibleSection accentClass="card-accent--blue" className="audio-card" collapsed={collapsedSections.audio} icon="audio" id="audio-settings" onToggle={() => toggleSection('audio')} title={t('audio.title')}>
             <AudioSettings audio={audio} onChange={updateAudio} t={t} />
           </CollapsibleSection>
 
-          <CollapsibleSection accentClass="card-accent--pink" className="spin-card" collapsed={collapsedSections.spin} id="spin-settings" onToggle={() => toggleSection('spin')} title={t('spinSettings.title')}>
+          <CollapsibleSection accentClass="card-accent--pink" className="spin-card" collapsed={collapsedSections.spin} icon="settings" id="spin-settings" onToggle={() => toggleSection('spin')} title={t('spinSettings.title')}>
             <SpinSettings {...spinSettings} onChange={(updates) => setSpinSettings((current) => ({ ...current, ...updates }))} t={t} />
           </CollapsibleSection>
 
@@ -411,6 +413,7 @@ function App() {
             accentClass="card-accent--violet"
             className="templates-card"
             collapsed={collapsedSections.templates}
+            icon="inspiration"
             id="templates"
             onToggle={() => toggleSection('templates')}
             title={t('templates.title')}
@@ -427,7 +430,7 @@ function App() {
             />
           </CollapsibleSection>
 
-          <CollapsibleSection accentClass="card-accent--blue" className="session-card secondary-section" collapsed={collapsedSections.session} id="session" onToggle={() => toggleSection('session')} title={t('session.title')}>
+          <CollapsibleSection accentClass="card-accent--blue" className="session-card secondary-section" collapsed={collapsedSections.session} icon="save" id="session" onToggle={() => toggleSection('session')} title={t('session.title')}>
             <SessionControls
               canRestore={canRestore}
               confirmation={sessionConfirmation}
@@ -447,6 +450,7 @@ function App() {
           {activeRuntimeWheel ? (
             <nav className="wheel-context" aria-label={runtimePath.map((entry) => entry.parentLabel).join(' › ')}>
               <span className="wheel-context__title">
+                <span className="wheel-context__label">{t('wheel.subwheelContext')}:</span>
                 {runtimePath.map((entry, index) => (
                   <span className="wheel-context__crumb" key={entry.pathId}>
                     {index ? <span aria-hidden="true">›</span> : null}
@@ -472,7 +476,9 @@ function App() {
             } : null}
             options={activeOptions}
             probabilities={probabilityResult.probabilities}
-            probabilityError={probabilityResult.error}
+            probabilityError={probabilityResult.errorCode
+              ? t(`probability.${probabilityResult.errorCode}`, probabilityResult.errorParams)
+              : probabilityResult.error}
             spinSettings={spinSettings}
             t={t}
           />
