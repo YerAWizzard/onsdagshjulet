@@ -21,6 +21,9 @@ import {
   normalizeAngle,
 } from './WheelPhysics.js'
 
+const BUFFER_OVERSAMPLE = 1.5
+const MAX_BUFFER_BITMAP_SIZE = 4096
+
 const WheelCanvas = forwardRef(function WheelCanvas(
   { items, label, onSpinComplete, onSpinStateChange, onTick },
   ref,
@@ -46,6 +49,8 @@ const WheelCanvas = forwardRef(function WheelCanvas(
     const context = canvas.getContext('2d')
     const pixelRatio = canvas.width / size
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    context.imageSmoothingEnabled = true
+    context.imageSmoothingQuality = 'high'
     context.clearRect(0, 0, size, size)
     context.save()
     context.translate(size / 2, size / 2)
@@ -130,7 +135,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
 
     const resizeCanvas = () => {
       const bounds = canvas.getBoundingClientRect()
-      const size = Math.max(1, Math.floor(Math.min(bounds.width, bounds.height)))
+      const size = Math.max(1, Math.min(bounds.width, bounds.height))
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 4)
       const bitmapSize = Math.round(size * pixelRatio)
 
@@ -142,10 +147,14 @@ const WheelCanvas = forwardRef(function WheelCanvas(
       sizeRef.current = size
 
       const buffer = document.createElement('canvas')
-      buffer.width = bitmapSize
-      buffer.height = bitmapSize
+      const bufferBitmapSize = Math.min(
+        MAX_BUFFER_BITMAP_SIZE,
+        Math.round(bitmapSize * BUFFER_OVERSAMPLE),
+      )
+      buffer.width = bufferBitmapSize
+      buffer.height = bufferBitmapSize
       const bufferContext = buffer.getContext('2d')
-      const renderScale = bitmapSize / WHEEL_SIZE
+      const renderScale = bufferBitmapSize / WHEEL_SIZE
       bufferContext.setTransform(renderScale, 0, 0, renderScale, 0, 0)
       drawWheel(bufferContext, items, visualOrderRef.current)
       bufferRef.current = buffer

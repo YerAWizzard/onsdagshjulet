@@ -17,7 +17,7 @@ function SectionIcon({ accentClass, name }) {
   )
 }
 
-function CollapsibleSection({ accentClass, children, className = '', collapsed, icon, id, onToggle, title }) {
+function CollapsibleSection({ accentClass, children, className = '', collapsed, icon, id, onToggle, sectionRef: externalSectionRef, title }) {
   const contentId = `${id}-content`
   const sectionRef = useRef(null)
   const wasCollapsedRef = useRef(collapsed)
@@ -35,7 +35,13 @@ function CollapsibleSection({ accentClass, children, className = '', collapsed, 
   }, [collapsed])
 
   return (
-    <section ref={sectionRef} className={`glass-card collapsible-section ${className}${collapsed ? ' is-collapsed' : ''}`}>
+    <section
+      ref={(node) => {
+        sectionRef.current = node
+        if (externalSectionRef) externalSectionRef.current = node
+      }}
+      className={`glass-card collapsible-section ${className}${collapsed ? ' is-collapsed' : ''}`}
+    >
       <button
         aria-controls={contentId}
         aria-expanded={!collapsed}

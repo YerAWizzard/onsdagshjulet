@@ -7,6 +7,7 @@ import SessionControls from './components/ControlPanel/SessionControls.jsx'
 import SpinSettings from './components/ControlPanel/SpinSettings.jsx'
 import Templates from './components/ControlPanel/Templates.jsx'
 import WheelSettings from './components/ControlPanel/WheelSettings.jsx'
+import { scrollToSidebarSectionTop } from './components/ControlPanel/scrollIntoSidebarView.js'
 import Wheel from './components/Wheel/Wheel.jsx'
 import { createTranslator, templateCatalog } from './i18n.js'
 import { AudioEngine, DEFAULT_MUSIC, MUSIC_TRACKS } from './lib/AudioEngine.js'
@@ -47,15 +48,17 @@ const createOption = (label, star = false, percentage = '', subWheel = null) => 
 
 function hydrateSubWheel(subWheel) {
   if (!subWheel || !Array.isArray(subWheel.options)) return null
+  const hydratedOptions = subWheel.options.slice(0, 30).map((option) => createOption(
+    String(option.label ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
+    Boolean(option.star),
+    option.percentage ?? '',
+    hydrateSubWheel(option.subWheel),
+  ))
+  while (hydratedOptions.length < 2) hydratedOptions.push(createOption(''))
   return {
     id: String(subWheel.id ?? `sub-wheel-${Date.now()}-${Math.random()}`),
     title: String(subWheel.title ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
-    options: subWheel.options.slice(0, 30).map((option) => createOption(
-      String(option.label ?? '').slice(0, MAX_OPTION_LABEL_LENGTH),
-      Boolean(option.star),
-      option.percentage ?? '',
-      hydrateSubWheel(option.subWheel),
-    )),
+    options: hydratedOptions,
   }
 }
 
@@ -71,6 +74,17 @@ function serializeSubWheel(subWheel) {
       ...(nestedSubWheel ? { subWheel: serializeSubWheel(nestedSubWheel) } : {}),
     })),
   }
+}
+
+function findSubWheelById(options, subWheelId) {
+  for (const option of options) {
+    if (option.subWheel?.id === subWheelId) return option.subWheel
+    const nestedMatch = option.subWheel
+      ? findSubWheelById(option.subWheel.options, subWheelId)
+      : null
+    if (nestedMatch) return nestedMatch
+  }
+  return null
 }
 
 function localizeSubWheel(subWheel, locale) {
@@ -129,6 +143,7 @@ function App() {
   const [runtimePath, setRuntimePath] = useState([])
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [pendingTemplate, setPendingTemplate] = useState(null)
+  const [templateScrollRequest, setTemplateScrollRequest] = useState(0)
   const [inspirationIndex] = useState(() => Math.floor(Math.random() * 5) + 1)
   const [audio, setAudio] = useState(loadMusicPreferences)
   const [initialSession] = useState(() => restoreSession())
@@ -139,6 +154,7 @@ function App() {
   const [spinSettings, setSpinSettings] = useState({ minSeconds: 3, maxSeconds: 11 })
   const audioEngineRef = useRef(null)
   const initialAudioRef = useRef(audio)
+  const settingsSectionRef = useRef(null)
 
   if (!audioEngineRef.current) audioEngineRef.current = new AudioEngine()
 
@@ -175,6 +191,14 @@ function App() {
     sessionStorage.setItem(COLLAPSED_SECTIONS_KEY, JSON.stringify(collapsedSections))
   }, [collapsedSections])
 
+  useEffect(() => {
+    if (!templateScrollRequest) return undefined
+    const animationFrame = requestAnimationFrame(() => {
+      scrollToSidebarSectionTop(settingsSectionRef.current)
+    })
+    return () => cancelAnimationFrame(animationFrame)
+  }, [templateScrollRequest])
+
   const toggleSection = useCallback((section) => {
     setCollapsedSections((current) => ({ ...current, [section]: !current[section] }))
   }, [])
@@ -195,18 +219,29 @@ function App() {
   )
 
   const activeRuntimeWheel = runtimePath[runtimePath.length - 1] ?? null
-  const activeOptions = activeRuntimeWheel?.options ?? options
+  const activeSubWheel = useMemo(
+    () => activeRuntimeWheel ? findSubWheelById(options, activeRuntimeWheel.id) : null,
+    [activeRuntimeWheel, options],
+  )
+  const activeOptions = activeRuntimeWheel ? activeSubWheel?.options ?? options : options
   const probabilityResult = useMemo(() => calculateProbabilities(activeOptions), [activeOptions])
   const rootProbabilityResult = useMemo(() => calculateProbabilities(options), [options])
+
+  useEffect(() => {
+    if (!activeRuntimeWheel || activeSubWheel) return
+    setRuntimePath((current) => current.slice(0, -1))
+  }, [activeRuntimeWheel, activeSubWheel])
   const updateOption = (id, updates) => {
     setOptions((current) => current.map((option) => (option.id === id ? { ...option, ...updates } : option)))
     setSelectedTemplate(null)
   }
 
   const addOption = () => {
-    const addToOptions = (current) => (current.length >= 30 ? current : [...current, createOption(`${locale === 'sv' ? 'Val' : 'Option'} ${current.length + 1}`)])
-    setOptions(addToOptions)
+    if (options.length >= 30) return null
+    const nextOption = createOption(`${locale === 'sv' ? 'Val' : 'Option'} ${options.length + 1}`)
+    setOptions((current) => (current.length >= 30 ? current : [...current, nextOption]))
     setSelectedTemplate(null)
+    return nextOption.id
   }
 
   const removeOption = (id) => {
@@ -238,6 +273,8 @@ function App() {
     setSelectedTemplate(pendingTemplate.id)
     setPendingTemplate(null)
     setSessionMessage('')
+    setCollapsedSections((current) => ({ ...current, settings: false }))
+    setTemplateScrollRequest((current) => current + 1)
   }
 
   const togglePendingTemplate = (template) => {
@@ -386,6 +423,7 @@ function App() {
             icon="choices"
             id="wheel-settings"
             onToggle={() => toggleSection('settings')}
+            sectionRef={settingsSectionRef}
             title={t('settings.title')}
           >
             <WheelSettings

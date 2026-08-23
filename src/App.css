@@ -423,10 +423,16 @@
 }
 
 .wheel-card {
+  --wheel-context-slot: 3rem;
+  --wheel-context-lift: var(--wheel-context-slot);
+  --wheel-context-remainder: 0rem;
+
   position: sticky;
   top: 0;
+  display: flex;
   box-sizing: border-box;
   height: calc(100svh - 5rem);
+  flex-direction: column;
   padding-top: clamp(0.65rem, 1vh, 1rem);
   min-height: 0;
   align-self: start;
@@ -434,21 +440,17 @@
 }
 
 .wheel-context {
-  position: absolute;
+  position: relative;
   z-index: 6;
-  left: 0;
-  right: 0;
-  bottom: auto;
-  top: 3px;
   display: grid;
-  grid-template-columns: minmax(0, 30rem) auto;
-  align-items: start;
-  justify-content: space-between;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: 1rem;
-  margin: 0;
+  width: 100%;
+  flex: 0 0 auto;
+  margin: calc(-1 * var(--wheel-context-lift)) 0 0.5rem;
   color: #ddd6e8;
   font-size: 0.82rem;
-  pointer-events: none;
 }
 
 .wheel-context__title {
@@ -465,7 +467,6 @@
   background: rgba(25, 18, 52, 0.76);
   box-shadow: 0 6px 18px rgba(3, 2, 15, 0.16);
   line-height: 1.35;
-  pointer-events: auto;
 }
 
 .wheel-context__crumb {
@@ -497,7 +498,11 @@
   cursor: pointer;
   font: inherit;
   font-weight: 700;
-  pointer-events: auto;
+}
+
+.wheel-card > .wheel-engine {
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .settings-content,
@@ -534,6 +539,70 @@
   font-size: 0.98rem;
 }
 
+.settings-control-help {
+  display: grid;
+  max-width: 46rem;
+  gap: 0;
+  font-size: 1.06rem;
+  line-height: 1.55;
+}
+
+.settings-card .settings-control-help {
+  font-size: 1.06rem;
+}
+
+.settings-control-help p {
+  margin: 0;
+}
+
+.settings-control-help__list {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+  margin-left: 0.625rem;
+}
+
+.settings-control-help__list > div {
+  display: grid;
+  grid-template-columns: 1.7rem minmax(0, 1fr);
+  gap: 0.48rem;
+  align-items: center;
+}
+
+.settings-control-help__term {
+  display: inline-grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 0.42rem;
+  font-size: 0.76em;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.settings-control-help .settings-control-help__outro {
+  margin-top: 0.7rem;
+  color: #c9c2d4;
+  font-size: 0.92em;
+}
+
+.settings-control-help__term--probability {
+  color: #9bedff;
+  background: rgba(23, 53, 74, 0.72);
+}
+
+.settings-control-help__term--star {
+  color: #ffe58f;
+  background: rgba(58, 45, 19, 0.78);
+}
+
+.settings-control-help__term--subwheel {
+  color: #d9caff;
+  background: rgba(85, 60, 145, 0.45);
+}
+
 .option-list {
   display: grid;
   gap: 0.62rem;
@@ -564,7 +633,7 @@
 
 .option-row {
   display: grid;
-  grid-template-columns: 2.45rem minmax(0, 1fr) 2.45rem 2.45rem 2.45rem;
+  grid-template-columns: 2.45rem minmax(0, 1fr) auto 2.45rem 2.45rem;
   gap: 0.45rem;
   align-items: start;
 }
@@ -653,7 +722,7 @@
 
 .sub-option-row {
   display: grid;
-  grid-template-columns: 1rem minmax(0, 1fr) 2rem 2rem 2rem;
+  grid-template-columns: 1rem minmax(0, 1fr) auto 2rem 2rem;
   min-width: 0;
   gap: 0.35rem;
   align-items: center;
@@ -661,6 +730,10 @@
 
 .sub-option-probability {
   width: 2rem;
+}
+
+.sub-option-probability.has-explicit-value {
+  width: 2.3rem;
 }
 
 .sub-option-probability .probability-trigger {
@@ -762,6 +835,7 @@
 }
 
 .sub-option-probability-editor {
+  width: min(calc(100% - 1.35rem), 21rem);
   margin-left: 1.35rem;
 }
 
@@ -868,6 +942,11 @@
 .probability-selector {
   position: relative;
   width: 2.45rem;
+  transition: width 160ms ease;
+}
+
+.probability-selector.has-explicit-value {
+  width: 2.75rem;
 }
 
 .probability-trigger {
@@ -885,8 +964,15 @@
   font: inherit;
   font-size: 0.72rem;
   font-weight: 800;
-  overflow: visible;
+  letter-spacing: -0.025em;
+  overflow: hidden;
+  text-overflow: clip;
   white-space: nowrap;
+}
+
+.probability-trigger.is-active {
+  padding-inline: 0.12rem;
+  font-size: clamp(0.58rem, 1.55vw, 0.7rem);
 }
 
 .probability-trigger,
@@ -971,14 +1057,19 @@
 .inline-probability-editor {
   display: grid;
   grid-template-columns: minmax(6.5rem, 8rem) auto;
-  gap: 0.5rem;
+  width: min(calc(100% - 2.9rem), 21rem);
+  gap: 0.4rem;
   align-items: center;
   margin-left: 2.9rem;
-  padding: 0.55rem;
+  padding: 0.45rem;
   border: 1px solid rgba(41, 215, 255, 0.18);
   border-radius: 0.72rem;
   background: rgba(12, 19, 42, 0.72);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.inline-probability-editor.sub-option-probability-editor {
+  width: min(calc(100% - 1.35rem), 21rem);
 }
 
 .probability-value-field {
@@ -1373,7 +1464,7 @@
 
 .probability-summary {
   display: grid;
-  gap: 0.35rem;
+  gap: 0;
   margin-top: 0.7rem;
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.09);
@@ -1381,14 +1472,53 @@
   background: rgba(5, 9, 26, 0.55);
 }
 
+.probability-summary__tree {
+  display: grid;
+  gap: 0.62rem;
+}
+
+.probability-summary__node {
+  position: relative;
+  min-width: 0;
+}
+
+.probability-summary__children {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.28rem 0 0.05rem 0.42rem;
+  padding-left: 0.78rem;
+  border-left: 1px solid rgba(164, 122, 255, 0.42);
+}
+
 .probability-summary__row {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  gap: 1rem;
-  padding-left: calc(var(--probability-depth) * 1rem);
+  gap: 0.85rem;
   color: #ccc3d8;
   font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.probability-summary__children > .probability-summary__node > .probability-summary__row::before {
+  position: absolute;
+  top: 0.68em;
+  left: -0.78rem;
+  width: 0.56rem;
+  border-top: 1px solid rgba(164, 122, 255, 0.42);
+  content: '';
+}
+
+.probability-summary__row.is-root {
+  color: #ece7f4;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.probability-summary__row.has-children:not(.is-root) {
+  color: #ded4ed;
+  font-weight: 700;
 }
 
 .probability-summary__row span {
@@ -1398,7 +1528,18 @@
 
 .probability-summary__row strong {
   color: #fff0a5;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
   white-space: nowrap;
+}
+
+.probability-summary__scope-note {
+  margin: 0.72rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: #928da3;
+  font-size: 0.63rem;
+  line-height: 1.4;
 }
 
 .probability-summary__subwheel-toggle {
@@ -1704,6 +1845,9 @@
   }
 
   .wheel-card {
+    --wheel-context-lift: clamp(0.4375rem, calc(17.628svh - 130.4px), var(--wheel-context-slot));
+    --wheel-context-remainder: calc(var(--wheel-context-slot) - var(--wheel-context-lift));
+
     grid-column: 2;
     grid-row: 4;
     top: 6rem;
@@ -1711,6 +1855,15 @@
     margin-top: clamp(7px, calc(17.628svh - 130.4px), 60px);
     padding-top: 0;
     align-self: stretch;
+  }
+
+  .wheel-context + .wheel-engine {
+    padding-bottom: calc(var(--wheel-context-remainder) + clamp(0.3rem, 0.75svh, 0.5rem));
+  }
+
+  .wheel-context + .wheel-engine .wheel-stage {
+    box-sizing: border-box;
+    padding-inline: var(--wheel-context-remainder);
   }
 
   .template-row {
@@ -1857,7 +2010,7 @@
   }
 
   .option-row {
-    grid-template-columns: 2.15rem minmax(0, 1fr) 2.15rem 2.15rem 2.15rem;
+    grid-template-columns: 2.15rem minmax(0, 1fr) auto 2.15rem 2.15rem;
     gap: 0.3rem;
   }
 
@@ -1875,6 +2028,10 @@
     width: 2.15rem;
   }
 
+  .probability-selector.has-explicit-value {
+    width: 2.45rem;
+  }
+
   .probability-trigger {
     height: 2.5rem;
     font-size: 0.68rem;
@@ -1882,6 +2039,7 @@
 
   .inline-probability-editor {
     grid-template-columns: 1fr;
+    width: 100%;
     margin-left: 0;
   }
 
@@ -1899,8 +2057,9 @@
   }
 
   .sub-option-row {
-    grid-template-columns: 0.75rem minmax(0, 1fr) 2.15rem 2.15rem 2.15rem;
-    gap: 0.28rem;
+    grid-template-columns: 0.75rem minmax(0, 1fr) auto 2.15rem 2.15rem;
+    column-gap: 0.35rem;
+    row-gap: 0.28rem;
   }
 
   .sub-option-row > span {
@@ -1915,6 +2074,10 @@
     grid-column: 3;
     grid-row: 2;
     width: 2.15rem;
+  }
+
+  .sub-option-probability.has-explicit-value {
+    width: 2.45rem;
   }
 
   .sub-option-probability .probability-trigger {
@@ -1935,7 +2098,8 @@
     height: 2.5rem;
   }
 
-  .sub-option-probability-editor {
+  .inline-probability-editor.sub-option-probability-editor {
+    width: 100%;
     margin-left: 0;
   }
 
@@ -1944,8 +2108,36 @@
   }
 
   .probability-summary__row {
-    gap: 0.65rem;
-    padding-left: calc(var(--probability-depth) * 0.6rem);
+    gap: 0.55rem;
+  }
+
+  .probability-summary__tree {
+    gap: 0.52rem;
+  }
+
+  .probability-summary__children {
+    margin-left: 0.24rem;
+    padding-left: 0.52rem;
+  }
+
+  .probability-summary__children > .probability-summary__node > .probability-summary__row::before {
+    left: -0.52rem;
+    width: 0.38rem;
+  }
+
+  .settings-card .settings-control-help {
+    font-size: 1rem;
+    line-height: 1.48;
+  }
+
+  .settings-control-help__list {
+    gap: 0.24rem;
+    margin-top: 0.4rem;
+    margin-left: 0.5rem;
+  }
+
+  .settings-control-help .settings-control-help__outro {
+    margin-top: 0.65rem;
   }
 
   .probability-editor-actions button {
@@ -1976,16 +2168,11 @@
   }
 
   .wheel-context {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.45rem;
+    gap: 0.55rem;
   }
 
   .wheel-context__title {
     max-width: min(100%, 28rem);
-  }
-
-  .wheel-context__back {
-    grid-row: 2;
   }
 
   .app-footer {

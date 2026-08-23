@@ -28,6 +28,10 @@ function segmentCountFor(itemCount) {
 export function createVisualOrder(items) {
   const count = segmentCountFor(items.length)
   const ids = items.map((item, index) => item.id ?? index)
+
+  if (!ids.length) return []
+  if (ids.length === 1) return Array(count).fill(ids[0])
+
   const output = []
   let bag = []
 
@@ -70,14 +74,150 @@ function segmentPath(context, centerX, centerY, radius, start, end) {
   context.closePath()
 }
 
-function fitCanvasText(context, text, maximumWidth, maximumHeight) {
-  let size = Math.min(48, maximumHeight)
-  context.font = `700 ${size}px Fredoka, sans-serif`
-  while (size > 10 && context.measureText(text).width > maximumWidth) {
-    size -= 1
-    context.font = `700 ${size}px Fredoka, sans-serif`
+function balancedLines(context, words, lineCount) {
+  if (lineCount === 1) return [words.join(' ')]
+  let best = null
+
+  const visit = (startIndex, lines) => {
+    const remainingLines = lineCount - lines.length
+    if (remainingLines === 1) {
+      const candidate = [...lines, words.slice(startIndex).join(' ')]
+      const widths = candidate.map((line) => context.measureText(line).width)
+      const widest = Math.max(...widths)
+      const unevenness = widths.reduce((total, width) => total + (widest - width) ** 2, 0)
+      const score = widest * 1000 + unevenness
+      if (!best || score < best.score) best = { lines: candidate, score }
+      return
+    }
+
+    const lastSplit = words.length - (remainingLines - 1)
+    for (let split = startIndex + 1; split <= lastSplit; split += 1) {
+      visit(split, [...lines, words.slice(startIndex, split).join(' ')])
+    }
   }
-  return size
+
+  visit(0, [])
+  return best?.lines ?? [words.join(' ')]
+}
+
+function splitTrailingEmoji(text) {
+  const parts = String(text).trim().split(/\s+/).filter(Boolean)
+  const possibleEmoji = parts.at(-1) ?? ''
+  const emojiOnly = /^(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji_Modifier}|\uFE0F|\u200D)+$/u
+
+  if (parts.length > 1 && emojiOnly.test(possibleEmoji)) {
+    return {
+      words: parts.slice(0, -1),
+      trailingEmoji: possibleEmoji,
+    }
+  }
+
+  return { words: parts, trailingEmoji: '' }
+}
+
+function measureLabelLayout(context, lines, trailingEmoji, fontSize) {
+  const strokeWidth = Math.max(2, fontSize * 0.1)
+  const emojiFontSize = fontSize * 0.82
+  const emojiGap = trailingEmoji ? fontSize * 0.16 : 0
+
+  context.font = `700 ${fontSize}px Fredoka, sans-serif`
+  const lineWidths = lines.map((line) => context.measureText(line).width)
+  let emojiWidth = 0
+  if (trailingEmoji) {
+    context.font = `700 ${emojiFontSize}px Fredoka, sans-serif`
+    emojiWidth = context.measureText(trailingEmoji).width
+    lineWidths[lineWidths.length - 1] += emojiGap + emojiWidth
+  }
+
+  return {
+    blockHeight: lines.length * fontSize * 1.16 + strokeWidth + 4,
+    contentWidth: Math.max(...lineWidths) + strokeWidth + 4,
+    emojiFontSize,
+    emojiGap,
+  }
+}
+
+function fitLineCount(context, words, trailingEmoji, lineCount, geometry) {
+  context.font = '700 100px Fredoka, sans-serif'
+  const lines = balancedLines(context, words, lineCount)
+
+  for (let fontSize = 76; fontSize >= 2; fontSize -= 0.5) {
+    const measurements = measureLabelLayout(
+      context,
+      lines,
+      trailingEmoji,
+      fontSize,
+    )
+    const halfHeight = measurements.blockHeight / 2
+    const outerEdgeSquared = geometry.outerSafeRadius ** 2 - halfHeight ** 2
+    if (outerEdgeSquared <= 0) continue
+
+    // Anchor each candidate against the wheel arc. The wedge is narrowest at
+    // the candidate's inner edge, so that corner determines slice containment.
+    const outerEdge = Math.sqrt(outerEdgeSquared)
+    const innerEdge = outerEdge - measurements.contentWidth
+    const availableHalfHeight = innerEdge * geometry.halfStepTangent
+
+    if (
+      innerEdge >= geometry.innerSafeRadius
+      && halfHeight + geometry.sliceMargin <= availableHalfHeight
+    ) {
+      return {
+        ...measurements,
+        fontSize,
+        lines,
+        textRadius: outerEdge - measurements.contentWidth / 2,
+        trailingEmoji,
+      }
+    }
+  }
+
+  return null
+}
+
+function fitCanvasLabel(context, text, geometry) {
+  const { words, trailingEmoji } = splitTrailingEmoji(text)
+  if (!words.length) {
+    return {
+      fontSize: 10,
+      lines: [''],
+      textRadius: geometry.innerSafeRadius + 24,
+      trailingEmoji,
+      emojiFontSize: 10,
+      emojiGap: 0,
+    }
+  }
+
+  const candidates = []
+  const maximumLines = Math.min(3, words.length)
+  for (let lineCount = 1; lineCount <= maximumLines; lineCount += 1) {
+    const candidate = fitLineCount(
+      context,
+      words,
+      trailingEmoji,
+      lineCount,
+      geometry,
+    )
+    if (candidate) candidates.push(candidate)
+  }
+
+  const singleLine = candidates.find((candidate) => candidate.lines.length === 1)
+  const twoLines = candidates.find((candidate) => candidate.lines.length === 2)
+  const threeLines = candidates.find((candidate) => candidate.lines.length === 3)
+
+  if (!singleLine) return twoLines ?? threeLines
+  if (!twoLines || singleLine.fontSize >= 38) return singleLine
+  if (twoLines.fontSize >= singleLine.fontSize * 1.14) {
+    if (
+      threeLines
+      && twoLines.fontSize < 16
+      && threeLines.fontSize >= twoLines.fontSize * 1.1
+    ) {
+      return threeLines
+    }
+    return twoLines
+  }
+  return singleLine
 }
 
 export function drawWheel(context, items, visualOrder) {
@@ -124,18 +264,13 @@ export function drawWheel(context, items, visualOrder) {
     context.fillRect(0, 0, size, size)
 
     const label = item.label
-    const radialStart = innerRadius + 42
-    const radialEnd = outerRadius - 42
-    const radialLength = radialEnd - radialStart
-    const textRadius = (radialStart + radialEnd) / 2
-    const wedgeWidth = 2 * textRadius * Math.sin(step / 2)
-    const maximumTextHeight = Math.max(12, wedgeWidth * 0.55)
-    const fontSize = fitCanvasText(
-      context,
-      label,
-      radialLength,
-      maximumTextHeight,
-    )
+    const labelLayout = fitCanvasLabel(context, label, {
+      halfStepTangent: Math.tan(step / 2),
+      innerSafeRadius: innerRadius + 18,
+      outerSafeRadius: outerRadius - 14,
+      sliceMargin: 5,
+    })
+    const fontSize = Math.round(labelLayout.fontSize * 10) / 10
 
     context.translate(centerX, centerY)
 
@@ -157,9 +292,37 @@ export function drawWheel(context, items, visualOrder) {
 
     const direction =
       normalized > Math.PI / 2 && normalized < Math.PI * 1.5 ? -1 : 1
-    const textX = direction * textRadius
-    context.strokeText(label, textX, 0, radialLength)
-    context.fillText(label, textX, 0, radialLength)
+    const textX = direction * labelLayout.textRadius
+    const lineHeight = fontSize * 1.16
+    const firstLineY = -((labelLayout.lines.length - 1) * lineHeight) / 2
+    labelLayout.lines.forEach((line, lineIndex) => {
+      const lineY = firstLineY + lineIndex * lineHeight
+      const isEmojiLine = Boolean(labelLayout.trailingEmoji)
+        && lineIndex === labelLayout.lines.length - 1
+      if (!isEmojiLine) {
+        context.strokeText(line, textX, lineY)
+        context.fillText(line, textX, lineY)
+        return
+      }
+
+      const textWidth = context.measureText(line).width
+      context.font = `700 ${labelLayout.emojiFontSize}px Fredoka, sans-serif`
+      const emojiWidth = context.measureText(labelLayout.trailingEmoji).width
+      const combinedWidth = textWidth + labelLayout.emojiGap + emojiWidth
+      const lineStart = textX - combinedWidth / 2
+
+      context.font = `700 ${fontSize}px Fredoka, sans-serif`
+      context.textAlign = 'left'
+      context.strokeText(line, lineStart, lineY)
+      context.fillText(line, lineStart, lineY)
+
+      context.font = `700 ${labelLayout.emojiFontSize}px Fredoka, sans-serif`
+      const emojiX = lineStart + textWidth + labelLayout.emojiGap
+      context.strokeText(labelLayout.trailingEmoji, emojiX, lineY)
+      context.fillText(labelLayout.trailingEmoji, emojiX, lineY)
+      context.font = `700 ${fontSize}px Fredoka, sans-serif`
+      context.textAlign = 'center'
+    })
 
     context.restore()
   })

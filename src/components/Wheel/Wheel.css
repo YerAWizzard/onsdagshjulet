@@ -9,11 +9,18 @@
   padding: 0 0.5rem 1rem;
 }
 
+.wheel-stage {
+  display: grid;
+  width: 100%;
+  place-items: start center;
+}
+
 .wheel-visual {
   --wheel-outer-ring-width: 26px;
   --wheel-pointer-scale: 1;
 
   position: relative;
+  box-sizing: border-box;
   width: min(100%, 720px);
   aspect-ratio: 1;
   padding: var(--wheel-outer-ring-width);
@@ -539,17 +546,25 @@
 
 @media (min-width: 1101px) {
   .wheel-engine {
-    height: 100%;
+    height: auto;
     min-height: 0;
+    flex: 1 1 auto;
     justify-content: flex-start;
     padding-bottom: clamp(0.3rem, 0.75svh, 0.5rem);
   }
 
+  .wheel-stage {
+    width: 100%;
+    min-height: 0;
+    flex: 1 1 0;
+    container-type: size;
+  }
+
   .wheel-visual {
-    width: auto;
-    max-width: 100%;
-    max-height: 720px;
-    flex: 1 1 720px;
+    width: min(100cqw, 100cqh, 720px);
+    max-width: none;
+    max-height: none;
+    flex: 0 0 auto;
   }
 
   .wheel-pointer {

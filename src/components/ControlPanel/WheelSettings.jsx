@@ -27,6 +27,8 @@ function WheelSettings({
   const [minimumChoiceConfirmation, setMinimumChoiceConfirmation] = useState(null)
   const probabilityInputRef = useRef(null)
   const minimumChoiceCancelRef = useRef(null)
+  const optionInputRefs = useRef(new Map())
+  const pendingNewOptionFocusRef = useRef(null)
   const sparkleTimerRef = useRef(null)
 
   useEffect(() => {
@@ -40,6 +42,23 @@ function WheelSettings({
     const animationFrame = requestAnimationFrame(() => minimumChoiceCancelRef.current?.focus())
     return () => cancelAnimationFrame(animationFrame)
   }, [minimumChoiceConfirmation])
+
+  useEffect(() => {
+    const pendingId = pendingNewOptionFocusRef.current
+    if (!pendingId) return undefined
+    const animationFrame = requestAnimationFrame(() => {
+      const input = optionInputRefs.current.get(pendingId)
+      if (!input) return
+      input.focus({ preventScroll: true })
+      input.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      })
+      pendingNewOptionFocusRef.current = null
+    })
+    return () => cancelAnimationFrame(animationFrame)
+  }, [options])
 
   const openProbabilityControl = (option) => {
     if (probabilityEditor?.id === option.id) {
@@ -83,12 +102,15 @@ function WheelSettings({
 
   const toggleSubWheel = (option, updateOption, expansionKey = option.id) => {
     if (!option.subWheel) {
+      const firstOption = createSubOption()
+      const secondOption = createSubOption()
+      pendingNewOptionFocusRef.current = firstOption.id
       updateOption({
         ...option,
         subWheel: {
           id: `custom-sub-wheel-${Date.now()}`,
           title: t('settings.defaultSubWheelTitle'),
-          options: [createSubOption(), createSubOption()],
+          options: [firstOption, secondOption],
         },
       })
       setExpandedSubWheels((current) => ({ ...current, [expansionKey]: true }))
@@ -110,7 +132,9 @@ function WheelSettings({
   }
 
   const addSubOption = (option, updateOption) => {
-    updateSubWheel(option, { options: [...option.subWheel.options, createSubOption()] }, updateOption)
+    const nextOption = createSubOption()
+    pendingNewOptionFocusRef.current = nextOption.id
+    updateSubWheel(option, { options: [...option.subWheel.options, nextOption] }, updateOption)
     setMinimumChoiceConfirmation((current) => current?.parentId === option.id ? null : current)
   }
 
@@ -143,6 +167,7 @@ function WheelSettings({
     )
     const otherExplicitTotal = siblings.reduce((total, sibling) => {
       if (sibling.id === option.id) return total
+      if (!String(sibling.label ?? '').trim()) return total
       const value = Number(String(sibling.percentage ?? '').trim().replace(',', '.'))
       return Number.isFinite(value) ? total + value : total
     }, 0)
@@ -162,8 +187,11 @@ function WheelSettings({
   const renderProbabilityTrigger = (option, accessibleName, className = '') => {
     const hasExplicitPercentage = String(option.percentage ?? '').trim() !== ''
     const editorOpen = probabilityEditor?.id === option.id
+    const triggerLabel = hasExplicitPercentage
+      ? `${String(option.percentage).trim().replace(',', '.')}%`
+      : '%'
     return (
-      <div className={`probability-selector${className ? ` ${className}` : ''}`}>
+      <div className={`probability-selector${hasExplicitPercentage ? ' has-explicit-value' : ''}${className ? ` ${className}` : ''}`}>
         <button
           aria-expanded={editorOpen}
           aria-label={accessibleName}
@@ -172,7 +200,7 @@ function WheelSettings({
           onClick={() => openProbabilityControl(option)}
           type="button"
         >
-          <span aria-hidden="true">%</span>
+          <span aria-hidden="true">{triggerLabel}</span>
         </button>
       </div>
     )
@@ -257,18 +285,23 @@ function WheelSettings({
                   <span aria-hidden="true">↳</span>
                   <div className="sub-option-fields">
                     <input
+                      ref={(node) => {
+                        if (node) optionInputRefs.current.set(subOption.id, node)
+                        else optionInputRefs.current.delete(subOption.id)
+                      }}
                       aria-label={t('settings.subOptionName', { number: subOptionIndex + 1, name: parentOption.label })}
                       maxLength={80}
                       onChange={(event) => updateChildOption({ ...subOption, label: event.target.value })}
+                      placeholder={t('settings.subOptionPlaceholder', { number: subOptionIndex + 1 })}
                       value={subOption.label}
                     />
                     {depth < 2 ? (
                       <button
                         aria-controls={subOption.subWheel ? `sub-wheel-editor-${childExpansionKey}` : undefined}
                         aria-expanded={childOpen}
-                        aria-label={t(subOption.subWheel ? 'settings.toggleSubWheel' : 'settings.addSubWheel', { name: subOption.label || subOptionIndex + 1 })}
+                        aria-label={t(subOption.subWheel ? childOpen ? 'settings.hideSubWheel' : 'settings.showSubWheel' : 'settings.addSubWheel', { name: subOption.label || subOptionIndex + 1 })}
                         className={`sub-wheel-action${subOption.subWheel ? ' has-sub-wheel' : ''}`}
-                        data-tooltip={!subOption.subWheel ? t('settings.addSubWheelTooltip') : undefined}
+                        data-tooltip={t(subOption.subWheel ? childOpen ? 'settings.hideSubWheelTooltip' : 'settings.showSubWheelTooltip' : 'settings.addSubWheelTooltip')}
                         onClick={() => toggleSubWheel(subOption, updateChildOption, childExpansionKey)}
                         type="button"
                       >
@@ -354,38 +387,58 @@ function WheelSettings({
 
   const containsSubWheel = (scopeOptions) => scopeOptions.some((option) => Boolean(option.subWheel))
 
-  const renderProbabilityRows = (scopeOptions, depth = 0, parentLabel = '') => {
+  const renderProbabilityNodes = (scopeOptions, depth = 0, parentLabel = '') => {
     const scopeResult = calculateProbabilities(scopeOptions)
-    const rows = []
-    scopeOptions.forEach((option, index) => {
-      const label = option.label || t('settings.unnamedOption', { number: index + 1 })
+    return scopeOptions.map((option, index) => {
+      const label = String(option.label ?? '').trim()
+      if (!label) return null
       const formattedProbability = scopeResult.error
         ? '—'
         : formatProbability(scopeResult.probabilities[index])
-      rows.push(
-        <div
-          className="probability-summary__row"
-          key={`${option.id}-probability`}
-          style={{ '--probability-depth': depth }}
-        >
+      const children = showSubwheelProbabilities && option.subWheel
+        ? renderProbabilityNodes(option.subWheel.options, depth + 1, label)
+        : []
+      const hasVisibleChildren = children.some(Boolean)
+      return (
+        <div className={`probability-summary__node${depth === 0 ? ' is-root' : ''}${hasVisibleChildren ? ' has-children' : ''}`} key={`${option.id}-probability`}>
+          <div className={`probability-summary__row${depth === 0 ? ' is-root' : ''}${hasVisibleChildren ? ' has-children' : ''}`}>
           <span>{label}</span>
           <strong aria-label={depth ? t('settings.localProbability', { parent: parentLabel, value: formattedProbability }) : undefined}>
             {formattedProbability}
           </strong>
-        </div>,
+          </div>
+          {hasVisibleChildren ? (
+            <div className="probability-summary__children">
+              {children}
+            </div>
+          ) : null}
+        </div>
       )
-      if (showSubwheelProbabilities && option.subWheel) {
-        rows.push(...renderProbabilityRows(option.subWheel.options, depth + 1, label))
-      }
     })
-    return rows
   }
 
   const hasSubWheels = containsSubWheel(options)
 
   return (
     <div className="settings-content">
-      <p className="panel-help">{t('settings.help')}</p>
+      <div className="panel-help settings-control-help">
+        <p>{t('settings.helpIntro')}</p>
+        <div className="settings-control-help__list" role="list">
+          <div role="listitem">
+            <span className="settings-control-help__term settings-control-help__term--probability">%</span>
+            <span>{t('settings.helpProbability')}</span>
+          </div>
+          <div role="listitem">
+            <span className="settings-control-help__term settings-control-help__term--star">★</span>
+            <span>{t('settings.helpStar')}</span>
+          </div>
+          <div role="listitem">
+            <span className="settings-control-help__term settings-control-help__term--subwheel">+</span>
+            <span>{t('settings.helpSubwheel')}</span>
+          </div>
+        </div>
+        <p className="settings-control-help__outro">{t('settings.helpOutro')}</p>
+      </div>
 
       <div className="option-list">
         {options.map((option, index) => {
@@ -399,6 +452,10 @@ function WheelSettings({
                 <span className="option-number">{index + 1}</span>
                 <div className="option-fields option-fields--with-sub-wheel-action">
                   <input
+                    ref={(node) => {
+                      if (node) optionInputRefs.current.set(option.id, node)
+                      else optionInputRefs.current.delete(option.id)
+                    }}
                     aria-label={t('settings.optionName', { number: index + 1 })}
                     className="option-name"
                     maxLength={80}
@@ -409,9 +466,9 @@ function WheelSettings({
                     <button
                       aria-controls={option.subWheel ? `sub-wheel-editor-${option.id}` : undefined}
                       aria-expanded={subWheelOpen}
-                      aria-label={t(option.subWheel ? 'settings.toggleSubWheel' : 'settings.addSubWheel', { name: option.label })}
+                      aria-label={t(option.subWheel ? subWheelOpen ? 'settings.hideSubWheel' : 'settings.showSubWheel' : 'settings.addSubWheel', { name: option.label })}
                       className={`sub-wheel-action${option.subWheel ? ' has-sub-wheel' : ''}`}
-                      data-tooltip={!option.subWheel ? t('settings.addSubWheelTooltip') : undefined}
+                      data-tooltip={t(option.subWheel ? subWheelOpen ? 'settings.hideSubWheelTooltip' : 'settings.showSubWheelTooltip' : 'settings.addSubWheelTooltip')}
                       onClick={() => toggleSubWheel(
                         option,
                         (updatedOption) => onUpdate(option.id, { subWheel: updatedOption.subWheel }),
@@ -460,7 +517,15 @@ function WheelSettings({
         })}
       </div>
 
-      <button className="panel-button panel-button--add" disabled={options.length >= 30} onClick={onAdd} type="button">
+      <button
+        className="panel-button panel-button--add"
+        disabled={options.length >= 30}
+        onClick={() => {
+          const nextId = onAdd()
+          if (nextId) pendingNewOptionFocusRef.current = nextId
+        }}
+        type="button"
+      >
         {t('settings.addRow')}
       </button>
 
@@ -475,7 +540,12 @@ function WheelSettings({
       </button>
       {showProbabilities ? (
         <div className="probability-summary">
-          {renderProbabilityRows(options)}
+          <div className="probability-summary__tree">
+            {renderProbabilityNodes(options)}
+          </div>
+          {hasSubWheels && showSubwheelProbabilities ? (
+            <p className="probability-summary__scope-note">{t('settings.subwheelScopeNote')}</p>
+          ) : null}
           {hasSubWheels ? (
             <button
               aria-expanded={showSubwheelProbabilities}

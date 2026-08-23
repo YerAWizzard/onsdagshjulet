@@ -25,9 +25,19 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
   const [winner, setWinner] = useState(null)
   const [winnerActionsDismissed, setWinnerActionsDismissed] = useState(false)
 
-  const wheelItems = useMemo(
-    () => options.map((option, index) => ({ ...option, id: index })),
+  const playableOptions = useMemo(
+    () => options.filter((option) => String(option.label ?? '').trim()),
     [options],
+  )
+  const playableProbabilities = useMemo(
+    () => options.reduce((result, option, index) => (
+      String(option.label ?? '').trim() ? [...result, probabilities[index]] : result
+    ), []),
+    [options, probabilities],
+  )
+  const wheelItems = useMemo(
+    () => playableOptions.map((option, index) => ({ ...option, id: index })),
+    [playableOptions],
   )
 
   useEffect(() => {
@@ -42,13 +52,13 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
 
   const handleSpinComplete = useCallback(
     (winnerIndex) => {
-      const winningOption = options[winnerIndex]
+      const winningOption = playableOptions[winnerIndex]
       const result = { ...winningOption, winId: `${Date.now()}-${Math.random()}` }
       setWinner(result)
       audioEngine.restoreMusic(2000)
       audioEngine.playWin(result.star)
     },
-    [audioEngine, options],
+    [audioEngine, playableOptions],
   )
 
   const handleSpin = useCallback(() => {
@@ -56,7 +66,7 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
     setWinner(null)
     setWinnerActionsDismissed(false)
     setIsCountingDown(true)
-    const winnerIndex = pickWeightedIndex(probabilities)
+    const winnerIndex = pickWeightedIndex(playableProbabilities)
     const spinDuration = getRandomSpinDuration(
       spinSettings.minSeconds,
       spinSettings.maxSeconds,
@@ -80,13 +90,14 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
       const started = wheelRef.current?.spin(winnerIndex, spinDuration)
       if (!started) audioEngine.restoreMusic()
     }, 2400))
-  }, [audioEngine, isCountingDown, isSpinning, probabilities, probabilityError, spinSettings, t])
+  }, [audioEngine, isCountingDown, isSpinning, playableProbabilities, probabilityError, spinSettings, t])
 
   const isBusy = isCountingDown || isSpinning
 
   return (
     <div className="wheel-engine">
-      <div className={`wheel-visual${winner ? winner.star ? ' wheel-visual--star-win' : ' wheel-visual--normal-win' : ''}`}>
+      <div className="wheel-stage">
+        <div className={`wheel-visual${winner ? winner.star ? ' wheel-visual--star-win' : ' wheel-visual--normal-win' : ''}`}>
         <div className="wheel-bulbs" aria-hidden="true">
           {BULBS.map((bulb, index) => (
             <i
@@ -124,11 +135,12 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
           onClick={handleSpin}
           type="button"
         />
-        {isCountingDown ? (
-          <div className={`wheel-countdown${countdownText === '1' ? ' wheel-countdown--final-number' : ''}`} key={countdownText} aria-live="assertive">
-            <strong>{countdownText}</strong>
-          </div>
-        ) : null}
+          {isCountingDown ? (
+            <div className={`wheel-countdown${countdownText === '1' ? ' wheel-countdown--final-number' : ''}`} key={countdownText} aria-live="assertive">
+              <strong>{countdownText}</strong>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <button
