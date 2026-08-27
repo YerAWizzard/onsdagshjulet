@@ -64,6 +64,7 @@ function AboutPopover({ t, version }) {
         <p>{t('about.paragraph1')}</p>
         <p>{t('about.paragraph2')}</p>
         <p>{t('about.paragraph3')}</p>
+        <p>{t('about.paragraph4')}</p>
         <small>{t('about.version', { version })}</small>
       </div>
     </div>

@@ -23,6 +23,7 @@ import {
 
 let optionId = 0
 const COLLAPSED_SECTIONS_KEY = 'onsdagshjulet:collapsed-sections:v1'
+const FOCUS_MODE_KEY = 'onsdagshjulet:focus-mode:v1'
 const OPEN_SECTIONS = { settings: false, audio: false, spin: true, session: true, templates: true }
 const MAX_OPTION_LABEL_LENGTH = 80
 
@@ -35,6 +36,14 @@ function loadCollapsedSections() {
     return { ...OPEN_SECTIONS, ...JSON.parse(sessionStorage.getItem(COLLAPSED_SECTIONS_KEY) || '{}') }
   } catch {
     return OPEN_SECTIONS
+  }
+}
+
+function loadFocusMode() {
+  try {
+    return sessionStorage.getItem(FOCUS_MODE_KEY) === 'true'
+  } catch {
+    return false
   }
 }
 
@@ -139,6 +148,7 @@ function formatSavedAt(value) {
 function App() {
   const [locale, setLocale] = useState('sv')
   const [collapsedSections, setCollapsedSections] = useState(loadCollapsedSections)
+  const [isFocusMode, setIsFocusMode] = useState(loadFocusMode)
   const [options, setOptions] = useState(DEFAULT_OPTIONS)
   const [runtimePath, setRuntimePath] = useState([])
   const [selectedTemplate, setSelectedTemplate] = useState(null)
@@ -190,6 +200,10 @@ function App() {
   useEffect(() => {
     sessionStorage.setItem(COLLAPSED_SECTIONS_KEY, JSON.stringify(collapsedSections))
   }, [collapsedSections])
+
+  useEffect(() => {
+    sessionStorage.setItem(FOCUS_MODE_KEY, String(isFocusMode))
+  }, [isFocusMode])
 
   useEffect(() => {
     if (!templateScrollRequest) return undefined
@@ -380,10 +394,10 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${isFocusMode ? ' app-shell--focus' : ''}`}>
       <div className="background-glow" aria-hidden="true" />
 
-      <main className="workspace">
+      <main className={`workspace${isFocusMode ? ' workspace--focus' : ''}`}>
         <header className="app-header">
           <div className="language-switch" aria-label={t('headerControlsLabel')}>
             <button
@@ -415,7 +429,34 @@ function App() {
           <p>{t('subtitle')}</p>
         </header>
 
-        <aside className="sidebar" aria-label={t('controlsLabel')}>
+        <div className="focus-mode-control">
+          <button
+            aria-controls="control-panel"
+            aria-expanded={!isFocusMode}
+            aria-label={t(isFocusMode ? 'focusMode.showLabel' : 'focusMode.hideLabel')}
+            className={`focus-mode-toggle${isFocusMode ? ' is-active' : ''}`}
+            onClick={() => setIsFocusMode((current) => !current)}
+            type="button"
+          >
+            <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+              <rect height="16" rx="2" width="18" x="3" y="4" />
+              <path d="M9 4v16" />
+              <path d={isFocusMode ? 'm13 9 3 3-3 3' : 'm16 9-3 3 3 3'} />
+            </svg>
+            <span>{t(isFocusMode ? 'focusMode.show' : 'focusMode.enter')}</span>
+          </button>
+          {isFocusMode ? (
+            <span className="focus-mode-helper">{t('focusMode.helper')}</span>
+          ) : null}
+        </div>
+
+        <aside
+          aria-hidden={isFocusMode}
+          aria-label={t('controlsLabel')}
+          className="sidebar"
+          id="control-panel"
+          inert={isFocusMode ? true : undefined}
+        >
           <CollapsibleSection
             accentClass="card-accent--pink"
             className="settings-card"
@@ -524,8 +565,9 @@ function App() {
       </main>
 
       <footer className="app-footer" aria-label={t('footer.label')}>
-        <span>{t('footer.version', { version: APP_VERSION })}</span>
-        <span>{t('footer.storage')}</span>
+        <span className="app-footer__version">{t('footer.version', { version: APP_VERSION })}</span>
+        <span className="app-footer__storage">{t('footer.storage')}</span>
+        <span className="app-footer__mobile-copy">{t('footer.mobile')}</span>
       </footer>
     </div>
   )

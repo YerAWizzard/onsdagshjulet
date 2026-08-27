@@ -5,6 +5,13 @@ export const translations = {
     subtitle: 'Kan ni inte bestämma er? Låt Onsdagshjulet välja.',
     headerControlsLabel: 'Språk och information',
     controlsLabel: 'Hjulreglage',
+    focusMode: {
+      enter: 'Maximera hjulet',
+      show: 'Visa kontroller',
+      helper: 'Klicka på “Visa kontroller” för att ändra dina val.',
+      hideLabel: 'Maximera hjulet och dölj kontroller',
+      showLabel: 'Visa kontroller och avsluta fokusläge',
+    },
     settings: {
       title: 'Lägg till dina val',
       help: 'Skriv in alternativen som hjulet ska välja mellan. Justera vinstchansen, markera en stjärnvinst eller använd + för att lägga till ett underhjul. Om ett val med underhjul vinner snurrar hjulet vidare mellan dess alternativ.',
@@ -152,15 +159,17 @@ export const translations = {
     },
     footer: {
       label: 'Programstatus',
+      mobile: 'Gör vardagen lite mer magisk.',
       version: 'Onsdagshjulet – Version {{version}}',
       storage: 'Dina val sparas bara på den här enheten. Inget konto behövs.',
     },
     about: {
       open: 'Om Onsdagshjulet',
       title: 'Om Onsdagshjulet',
-      paragraph1: 'Jag kollade runt på olika snurrhjul på nätet, men tyckte att de flesta var lite väl… tråkiga.',
-      paragraph2: 'Jag ville ha något med mer känsla, mer show och lite mer deluxe – utan att allt behöver vara så seriöst.',
-      paragraph3: 'Vi har ofta svårt att bestämma vad vi ska hitta på. Därför får Onsdagshjulet låta slumpen välja – från middag och utflykter till spontana små äventyr. Ibland behöver vardagen helt enkelt lite mer show.',
+      paragraph1: 'Jag kollade runt på olika “Spin the Wheel”-sidor på nätet, men tyckte att de flesta var lite väl… tråkiga.',
+      paragraph2: 'Jag ville ha något med mer känsla, mer personlighet och lite mer deluxe – utan att allt behöver vara så seriöst.',
+      paragraph3: 'Vi har ofta svårt att bestämma vad vi ska hitta på. Därför får Onsdagshjulet låta slumpen välja – från middag och utflykter till spontana små äventyr.',
+      paragraph4: 'Ibland är det helt enkelt skönt att slippa bestämma själv.',
       version: 'Version {{version}}',
     },
     probability: {
@@ -179,6 +188,13 @@ export const translations = {
     subtitle: 'Can’t decide? Let Onsdagshjulet choose.',
     headerControlsLabel: 'Language and information',
     controlsLabel: 'Wheel controls',
+    focusMode: {
+      enter: 'Maximize wheel',
+      show: 'Show controls',
+      helper: 'Click “Show controls” to edit your choices.',
+      hideLabel: 'Maximize the wheel and hide controls',
+      showLabel: 'Show controls and exit focus mode',
+    },
     settings: {
       title: 'Add your choices',
       help: 'Enter the options you want the wheel to choose between. Adjust the win chance, mark a star prize, or use + to add a subwheel. If an option with a subwheel wins, the wheel spins again between its options.',
@@ -326,15 +342,17 @@ export const translations = {
     },
     footer: {
       label: 'Application status',
+      mobile: 'Make everyday a little more magical.',
       version: 'Onsdagshjulet – Version {{version}}',
       storage: 'Your choices are saved only on this device. No account needed.',
     },
     about: {
       open: 'About Onsdagshjulet',
       title: 'About Onsdagshjulet',
-      paragraph1: 'I looked around at different spin-the-wheel sites online, but most of them felt a little too… boring.',
-      paragraph2: 'I wanted something with more personality, more show, and a little more deluxe – without taking everything so seriously.',
-      paragraph3: 'We’re also terrible at deciding what to actually do. So Onsdagshjulet lets chance choose – from dinner and outings to spontaneous little adventures. Sometimes everyday life simply needs a little more show.',
+      paragraph1: 'I looked around at different “Spin the Wheel” sites online, but thought most of them were a little too… boring.',
+      paragraph2: 'I wanted something with more feeling, more personality, and a little more deluxe – without everything having to be so serious.',
+      paragraph3: 'We often have a hard time deciding what to do. So Onsdagshjulet lets chance choose – from dinner and outings to spontaneous little adventures.',
+      paragraph4: 'Sometimes it’s simply nice not to have to decide for yourself.',
       version: 'Version {{version}}',
     },
     probability: {
