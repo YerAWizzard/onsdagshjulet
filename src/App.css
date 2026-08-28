@@ -2225,12 +2225,19 @@
     margin-left: 0.35rem;
   }
 
-  .sub-wheel-editor--depth-2 .sub-wheel-editor__heading {
+  .sub-wheel-editor__heading {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 0;
   }
 
-  .sub-wheel-editor--depth-2 .sub-wheel-editor__heading .sub-wheel-remove {
+  .sub-wheel-editor__heading strong {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .sub-wheel-editor__heading .sub-wheel-remove {
+    grid-column: 1;
+    grid-row: 2;
     justify-self: end;
     margin-top: 0;
   }
@@ -2313,7 +2320,28 @@
 
   .inline-probability-editor.sub-option-probability-editor {
     width: 100%;
+    gap: 0.3rem;
     margin-left: 0;
+    padding: 0.35rem;
+    border-radius: 0.62rem;
+  }
+
+  .sub-option-probability-editor .probability-value-field {
+    height: 2.15rem;
+  }
+
+  .sub-option-probability-editor .probability-value-field input {
+    padding-inline: 0.55rem;
+    font-size: 1rem;
+  }
+
+  .sub-option-probability-editor .probability-editor-actions {
+    gap: 0.3rem;
+  }
+
+  .sub-option-probability-editor .probability-editor-actions button {
+    min-height: 2.15rem;
+    padding: 0.25rem 0.55rem;
   }
 
   .sub-wheel-minimum-confirm {
