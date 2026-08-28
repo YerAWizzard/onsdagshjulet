@@ -2216,22 +2216,43 @@
   }
 
   .sub-wheel-editor {
+    gap: 0.4rem;
     margin-left: 0;
-    padding-left: 0.4rem;
+    padding: 0.45rem 0 0.45rem 0.4rem;
   }
 
   .sub-wheel-editor--depth-2 {
-    margin-left: 0.55rem;
+    margin-left: 0.35rem;
+  }
+
+  .sub-wheel-editor__heading {
+    column-gap: 0.35rem;
+    row-gap: 0.2rem;
+    align-items: center;
+  }
+
+  .sub-wheel-editor__heading .sub-wheel-remove {
+    max-width: 7.5rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.4rem;
+    line-height: 1.2;
+    text-align: right;
+    white-space: normal;
   }
 
   .sub-wheel-editor__actions {
     padding-left: 0;
   }
 
+  .sub-option-list,
+  .sub-option-group {
+    gap: 0.3rem;
+  }
+
   .sub-option-row {
-    grid-template-columns: 0.75rem minmax(0, 1fr) auto 2.15rem 2.15rem;
-    column-gap: 0.35rem;
-    row-gap: 0.28rem;
+    grid-template-columns: 0.65rem minmax(0, 1fr) auto 2.25rem 2.25rem;
+    column-gap: 0.4rem;
+    row-gap: 0.25rem;
   }
 
   .sub-option-row > span {
@@ -2245,11 +2266,11 @@
   .sub-option-probability {
     grid-column: 3;
     grid-row: 2;
-    width: 2.15rem;
+    width: 2.25rem;
   }
 
   .sub-option-probability.has-explicit-value {
-    width: 2.45rem;
+    width: 2.55rem;
   }
 
   .sub-option-probability .probability-trigger {
@@ -2259,14 +2280,14 @@
   .sub-option-row .sub-option-star {
     grid-column: 4;
     grid-row: 2;
-    width: 2.15rem;
+    width: 2.25rem;
     height: 2.5rem;
   }
 
   .sub-option-row > .sub-option-remove {
     grid-column: 5;
     grid-row: 2;
-    width: 2.15rem;
+    width: 2.25rem;
     height: 2.5rem;
   }
 
