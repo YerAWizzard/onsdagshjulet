@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Onsdagshjulet</title>
+  <defs>
+    <linearGradient id="rim" x1="64" y1="74" x2="448" y2="474" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff4fa3" />
+      <stop offset="0.34" stop-color="#ffd166" />
+      <stop offset="0.68" stop-color="#29d7ff" />
+      <stop offset="1" stop-color="#8b5cf6" />
+    </linearGradient>
+    <radialGradient id="hub" cx="45%" cy="38%" r="70%">
+      <stop stop-color="#fff4a8" />
+      <stop offset="0.42" stop-color="#ffd166" />
+      <stop offset="1" stop-color="#ff4fa3" />
+    </radialGradient>
+  </defs>
+
+  <circle cx="256" cy="274" r="220" fill="#241035" />
+  <circle cx="256" cy="274" r="211" fill="none" stroke="url(#rim)" stroke-width="18" />
+
+  <g stroke="#fff7d0" stroke-opacity="0.78" stroke-width="4" stroke-linejoin="round">
+    <path d="M256 274 256 76a198 198 0 0 1 140 58Z" fill="#ffd166" />
+    <path d="M256 274 396 134a198 198 0 0 1 58 140Z" fill="#29d7ff" />
+    <path d="M256 274 454 274a198 198 0 0 1-58 140Z" fill="#36d1a0" />
+    <path d="M256 274 396 414a198 198 0 0 1-140 58Z" fill="#8b5cf6" />
+    <path d="M256 274 256 472a198 198 0 0 1-140-58Z" fill="#ff4fa3" />
+    <path d="M256 274 116 414a198 198 0 0 1-58-140Z" fill="#f3a712" />
+    <path d="M256 274 58 274a198 198 0 0 1 58-140Z" fill="#29d7ff" />
+    <path d="M256 274 116 134a198 198 0 0 1 140-58Z" fill="#ff4fa3" />
+  </g>
+
+  <circle cx="256" cy="274" r="59" fill="#241035" stroke="#fff7d0" stroke-width="7" />
+  <circle cx="256" cy="274" r="50" fill="url(#hub)" />
+  <path d="m256 238 10.7 21.7 24 3.5-17.4 16.9 4.1 23.9-21.4-11.3-21.4 11.3 4.1-23.9-17.4-16.9 24-3.5Z" fill="#fffde0" />
+
+  <path d="M210 12h92l-46 91Z" fill="#ffd166" stroke="#241035" stroke-width="12" stroke-linejoin="round" />
+  <circle cx="256" cy="38" r="8" fill="#4b2b13" />
+</svg>
