@@ -612,7 +612,7 @@
 
   .wheel-visual {
     width: min(100%, 680px);
-    margin-top: 24px;
+    margin-top: 16px;
   }
 
   .wheel-pointer {
@@ -622,6 +622,11 @@
   .spin-button {
     min-height: 3.45rem;
     margin-top: 1.25rem;
+  }
+
+  .wheel-result {
+    min-height: 8.75rem;
+    padding: 1rem;
   }
 
   .wheel-result__actions {
