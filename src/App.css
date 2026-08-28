@@ -2297,6 +2297,10 @@
     width: 0.38rem;
   }
 
+  .probability-summary__children .probability-summary__row strong {
+    color: #d8c982;
+  }
+
   .settings-card .settings-control-help {
     font-size: 1rem;
     line-height: 1.48;
