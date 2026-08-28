@@ -2131,14 +2131,7 @@
   }
 
   .focus-mode-control {
-    justify-content: center;
-    margin: 0.1rem 0 0.75rem;
-  }
-
-  .focus-mode-helper {
-    left: 50%;
-    text-align: center;
-    transform: translateX(-50%);
+    display: none;
   }
 
   .sidebar {
