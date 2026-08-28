@@ -2307,8 +2307,9 @@
   }
 
   .wheel-card {
-    margin-top: 16px;
+    margin-top: 0;
     min-height: 560px;
+    padding-top: 0;
   }
 
   .wheel-context {
