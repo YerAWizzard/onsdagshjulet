@@ -2178,6 +2178,7 @@
 
   .template-row .template-confirm {
     grid-column: 1 / -1;
+    grid-row: auto;
     order: 1;
   }
 

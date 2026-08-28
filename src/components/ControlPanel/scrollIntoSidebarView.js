@@ -2,7 +2,31 @@ export function scrollIntoSidebarView(element, { bottomSpacing = 24, topSpacing 
   const sidebar = element?.closest('.sidebar')
   if (!element || !sidebar) return
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const behavior = reducedMotion ? 'auto' : 'smooth'
   const elementBounds = element.getBoundingClientRect()
+  const sidebarStyle = window.getComputedStyle(sidebar)
+  const sidebarScrolls = /(auto|scroll)/.test(sidebarStyle.overflowY)
+    && sidebar.scrollHeight > sidebar.clientHeight + 1
+
+  if (!sidebarScrolls) {
+    const viewportTop = window.visualViewport?.offsetTop ?? 0
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight
+    const viewportBottom = viewportTop + viewportHeight
+    if (
+      elementBounds.top >= viewportTop + topSpacing
+      && elementBounds.bottom <= viewportBottom - bottomSpacing
+    ) return
+
+    const availableHeight = viewportHeight - topSpacing - bottomSpacing
+    const scrollDelta = elementBounds.height > availableHeight || elementBounds.top < viewportTop + topSpacing
+      ? elementBounds.top - viewportTop - topSpacing
+      : elementBounds.bottom - viewportBottom + bottomSpacing
+
+    window.scrollBy({ behavior, top: scrollDelta })
+    return
+  }
+
   const sidebarBounds = sidebar.getBoundingClientRect()
   if (elementBounds.top >= sidebarBounds.top && elementBounds.bottom <= sidebarBounds.bottom) return
 
@@ -15,7 +39,7 @@ export function scrollIntoSidebarView(element, { bottomSpacing = 24, topSpacing 
   }
 
   sidebar.scrollBy({
-    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    behavior,
     top: scrollDelta,
   })
 }
