@@ -1481,7 +1481,6 @@
 .volume-control input {
   width: 100%;
   accent-color: #ff4fa3;
-  touch-action: pan-y;
 }
 
 .session-actions {
@@ -2457,6 +2456,13 @@
 
   .app-footer__mobile-copy {
     display: inline;
+  }
+}
+
+@media (max-width: 620px) and (hover: none) and (pointer: coarse) {
+  .volume-control input[type='range'] {
+    min-height: 2.75rem;
+    touch-action: pan-y;
   }
 }
 
