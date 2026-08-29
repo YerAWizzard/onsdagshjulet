@@ -367,6 +367,59 @@ export const translations = {
   },
 }
 
+const SHARED_SURPRISE_MOVIE_POOL = Object.freeze([
+  'The Shawshank Redemption',
+  'The Godfather',
+  'The Dark Knight',
+  'The Godfather Part II',
+  'The Lord of the Rings: The Return of the King',
+  '12 Angry Men',
+  "Schindler's List",
+  'The Lord of the Rings: The Fellowship of the Ring',
+  'Pulp Fiction',
+  'The Good, the Bad and the Ugly',
+  'The Lord of the Rings: The Two Towers',
+  'Forrest Gump',
+  'Fight Club',
+  'Inception',
+  'Star Wars: Episode V - The Empire Strikes Back',
+  'The Matrix',
+  'Interstellar',
+  'GoodFellas',
+  "One Flew Over the Cuckoo's Nest",
+  'Seven',
+  "It's a Wonderful Life",
+  'The Silence of the Lambs',
+  'Saving Private Ryan',
+  'Seven Samurai',
+  'The Green Mile',
+  'City of God',
+  'Life Is Beautiful',
+  'Terminator 2: Judgment Day',
+  'Back to the Future',
+  'Star Wars: Episode IV - A New Hope',
+  'Kill Bill: The Whole Bloody Affair',
+  'Spirited Away',
+  'Gladiator',
+  'The Pianist',
+  'Parasite',
+  'Grave of the Fireflies',
+  'Harakiri',
+  'Psycho',
+  'The Lion King',
+  'The Departed',
+  'Whiplash',
+  'The Prestige',
+  'American History X',
+  'Spider-Man: Across the Spider-Verse',
+  'Léon: The Professional',
+  'Cinema Paradiso',
+  'Casablanca',
+  'The Intouchables',
+  'The Usual Suspects',
+  'Django Unchained',
+])
+
 export const templateCatalog = [
   {
     id: 'creator-favorite', emoji: '⭐',
@@ -770,58 +823,7 @@ export const templateCatalog = [
                 },
                 optionSettings: {
                   5: {
-                    winnerNotePool: [
-                      'The Shawshank Redemption',
-                      'The Godfather',
-                      'The Dark Knight',
-                      'The Godfather Part II',
-                      'The Lord of the Rings: The Return of the King',
-                      '12 Angry Men',
-                      "Schindler's List",
-                      'The Lord of the Rings: The Fellowship of the Ring',
-                      'Pulp Fiction',
-                      'The Good, the Bad and the Ugly',
-                      'The Lord of the Rings: The Two Towers',
-                      'Forrest Gump',
-                      'Fight Club',
-                      'Inception',
-                      'Star Wars: Episode V - The Empire Strikes Back',
-                      'The Matrix',
-                      'Interstellar',
-                      'GoodFellas',
-                      "One Flew Over the Cuckoo's Nest",
-                      'Seven',
-                      "It's a Wonderful Life",
-                      'The Silence of the Lambs',
-                      'Saving Private Ryan',
-                      'Seven Samurai',
-                      'The Green Mile',
-                      'City of God',
-                      'Life Is Beautiful',
-                      'Terminator 2: Judgment Day',
-                      'Back to the Future',
-                      'Star Wars: Episode IV - A New Hope',
-                      'Kill Bill: The Whole Bloody Affair',
-                      'Spirited Away',
-                      'Gladiator',
-                      'The Pianist',
-                      'Parasite',
-                      'Grave of the Fireflies',
-                      'Harakiri',
-                      'Psycho',
-                      'The Lion King',
-                      'The Departed',
-                      'Whiplash',
-                      'The Prestige',
-                      'American History X',
-                      'Spider-Man: Across the Spider-Verse',
-                      'Léon: The Professional',
-                      'Cinema Paradiso',
-                      'Casablanca',
-                      'The Intouchables',
-                      'The Usual Suspects',
-                      'Django Unchained',
-                    ],
+                    winnerNotePool: SHARED_SURPRISE_MOVIE_POOL,
                   },
                 },
               },
@@ -943,8 +945,377 @@ export const templateCatalog = [
     id: 'movie', emoji: '🎬',
     name: { sv: 'Filmkväll', en: 'Movie night' },
     options: {
-      sv: ['Komedi', 'Thriller', 'Sci-fi', 'Animation', 'Drama', 'Dokumentär'],
-      en: ['Comedy', 'Thriller', 'Sci-fi', 'Animation', 'Drama', 'Documentary'],
+      sv: [
+        '📺 Starta en ny TV-serie',
+        '😂 Komedi',
+        '😰 Thriller',
+        '👻 Skräck',
+        '💥 Action / äventyr',
+        '🎭 Drama / klassiker',
+        '🚀 Sci-Fi',
+        '🧙 Fantasy',
+        '👨‍👩‍👧 Animation / familj',
+        '🇸🇪 Svenskt',
+        '🎲 Surprise me!',
+      ],
+      en: [
+        '📺 Start a new TV series',
+        '😂 Comedy',
+        '😰 Thriller',
+        '👻 Horror',
+        '💥 Action / adventure',
+        '🎭 Drama / classics',
+        '🚀 Sci-Fi',
+        '🧙 Fantasy',
+        '👨‍👩‍👧 Animation / family',
+        '🇸🇪 Swedish picks',
+        '🎲 Surprise me!',
+      ],
+    },
+    optionSettings: {
+      0: {
+        subWheel: {
+          id: 'movie-tv-series',
+          title: { sv: 'Vilken serie börjar vi med?', en: 'Which series should we start?' },
+          options: {
+            sv: [
+              'Dexter', 'Prison Break', 'Suits', 'Breaking Bad', 'Bones', 'Supernatural',
+              'Game of Thrones', 'House', 'The Last of Us', 'Stranger Things', 'Peaky Blinders',
+              'The Walking Dead', 'Sherlock', 'The Mentalist', 'Lucifer', 'Komedi',
+            ],
+            en: [
+              'Dexter', 'Prison Break', 'Suits', 'Breaking Bad', 'Bones', 'Supernatural',
+              'Game of Thrones', 'House', 'The Last of Us', 'Stranger Things', 'Peaky Blinders',
+              'The Walking Dead', 'Sherlock', 'The Mentalist', 'Lucifer', 'Comedy',
+            ],
+          },
+          optionSettings: {
+            14: { percentage: '11.8' },
+            15: {
+              subWheel: {
+                id: 'movie-tv-comedy',
+                title: { sv: 'Vilken komediserie?', en: 'Which comedy series?' },
+                options: {
+                  sv: [
+                    'Scrubs', 'How I Met Your Mother', 'The Big Bang Theory', 'Friends',
+                    'Brooklyn Nine-Nine', 'Shrinking', 'Modern Family', 'New Girl', 'Svensk komedi',
+                  ],
+                  en: [
+                    'Scrubs', 'How I Met Your Mother', 'The Big Bang Theory', 'Friends',
+                    'Brooklyn Nine-Nine', 'Shrinking', 'Modern Family', 'New Girl', 'Swedish comedy',
+                  ],
+                },
+                optionSettings: {
+                  8: {
+                    subWheel: {
+                      id: 'movie-tv-swedish-comedy',
+                      title: { sv: 'Vilken svensk komedi?', en: 'Which Swedish comedy?' },
+                      options: {
+                        sv: ['C/o Segemyhr', 'Hjälp!', 'Svensson, Svensson', 'Pappas flicka', 'Hipp Hipp!', 'NileCity 105,6'],
+                        en: ['C/o Segemyhr', 'Hjälp!', 'Svensson, Svensson', 'Pappas flicka', 'Hipp Hipp!', 'NileCity 105,6'],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      1: {
+        subWheel: {
+          id: 'movie-comedy',
+          title: { sv: 'Vilken sorts komedi?', en: 'What kind of comedy?' },
+          options: {
+            sv: ['Adam Sandler', 'Rom-com', 'Övrigt'],
+            en: ['Adam Sandler', 'Rom-com', 'Other'],
+          },
+          optionSettings: {
+            0: {
+              subWheel: {
+                id: 'movie-comedy-adam-sandler',
+                title: { sv: 'Vilken Adam Sandler-film?', en: 'Which Adam Sandler movie?' },
+                options: {
+                  sv: ['Blended', '50 First Dates', 'Just Go with It', 'The Wedding Singer', 'Grown Ups'],
+                  en: ['Blended', '50 First Dates', 'Just Go with It', 'The Wedding Singer', 'Grown Ups'],
+                },
+              },
+            },
+            1: {
+              subWheel: {
+                id: 'movie-comedy-romcom',
+                title: { sv: 'Vilken rom-com?', en: 'Which rom-com?' },
+                options: {
+                  sv: ['Crazy, Stupid, Love.', '10 Things I Hate About You', 'Notting Hill', 'How to Lose a Guy in 10 Days', 'Definitely, Maybe'],
+                  en: ['Crazy, Stupid, Love.', '10 Things I Hate About You', 'Notting Hill', 'How to Lose a Guy in 10 Days', 'Definitely, Maybe'],
+                },
+              },
+            },
+            2: {
+              subWheel: {
+                id: 'movie-comedy-other',
+                title: { sv: 'Vilken komedi?', en: 'Which comedy?' },
+                options: {
+                  sv: [
+                    "We're the Millers", 'Game Night', 'The Intern', 'Horrible Bosses',
+                    'Central Intelligence', 'The Proposal',
+                    '7:e filmen på komedilistan i streamingappen',
+                    'Feelgood-komedi – dealer’s choice',
+                  ],
+                  en: [
+                    "We're the Millers", 'Game Night', 'The Intern', 'Horrible Bosses',
+                    'Central Intelligence', 'The Proposal',
+                    'Pick the seventh movie on the comedy list in your streaming app',
+                    'Feel-good comedy – dealer’s choice',
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      2: {
+        subWheel: {
+          id: 'movie-thriller',
+          title: { sv: 'Vilken thriller?', en: 'Which thriller?' },
+          options: {
+            sv: [
+              'Se7en', 'Gone Girl', 'Shutter Island', 'Prisoners', 'Zodiac',
+              'The Girl with the Dragon Tattoo', 'Nightcrawler', 'The Invisible Man',
+              'A Quiet Place', 'The Guilty', 'Split', 'Get Out', 'The Menu', 'Searching',
+              'The Call', 'Ta femte thrillern på streaminglistan',
+              'Dealer’s choice – mörkt ska det vara',
+            ],
+            en: [
+              'Se7en', 'Gone Girl', 'Shutter Island', 'Prisoners', 'Zodiac',
+              'The Girl with the Dragon Tattoo', 'Nightcrawler', 'The Invisible Man',
+              'A Quiet Place', 'The Guilty', 'Split', 'Get Out', 'The Menu', 'Searching',
+              'The Call', 'Pick the fifth thriller in your streaming app',
+              'Dealer’s choice – make it dark',
+            ],
+          },
+        },
+      },
+      3: {
+        percentage: '5',
+        subWheel: {
+          id: 'movie-horror',
+          title: { sv: 'Vilken skräckfilm?', en: 'Which horror movie?' },
+          options: {
+            sv: [
+              'The Woman in Black', 'The Others', 'The Awakening', 'The Orphanage',
+              'Crimson Peak', 'The Changeling', 'The Devil’s Backbone', 'The Babadook',
+              'The Witch', 'Hereditary', 'The Night House', 'The Lodge',
+              'The Blackcoat’s Daughter', 'The Skeleton Key', 'The Autopsy of Jane Doe',
+              'The Invitation', 'Ta fjärde skräckfilmen på streaminglistan',
+              'Dealer’s choice – kusligt, inte slafsigt',
+            ],
+            en: [
+              'The Woman in Black', 'The Others', 'The Awakening', 'The Orphanage',
+              'Crimson Peak', 'The Changeling', 'The Devil’s Backbone', 'The Babadook',
+              'The Witch', 'Hereditary', 'The Night House', 'The Lodge',
+              'The Blackcoat’s Daughter', 'The Skeleton Key', 'The Autopsy of Jane Doe',
+              'The Invitation', 'Pick the fourth horror movie in your streaming app',
+              'Dealer’s choice – spooky, not gory',
+            ],
+          },
+        },
+      },
+      4: {
+        subWheel: {
+          id: 'movie-action',
+          title: { sv: 'Vilken action- eller äventyrsfilm?', en: 'Which action or adventure movie?' },
+          options: {
+            sv: [
+              'Mad Max: Fury Road', 'John Wick', 'Mission: Impossible', 'Top Gun: Maverick',
+              'Edge of Tomorrow', 'The Dark Knight', 'Gladiator', 'The Bourne Identity',
+              'Casino Royale', 'Indiana Jones and the Last Crusade', 'The Mummy',
+              'Pirates of the Caribbean', 'The Equalizer', 'Nobody', 'The Accountant',
+              'Ta sjätte filmen på actionlistan i streamingappen',
+              'Dealer’s choice – något med tempo',
+            ],
+            en: [
+              'Mad Max: Fury Road', 'John Wick', 'Mission: Impossible', 'Top Gun: Maverick',
+              'Edge of Tomorrow', 'The Dark Knight', 'Gladiator', 'The Bourne Identity',
+              'Casino Royale', 'Indiana Jones and the Last Crusade', 'The Mummy',
+              'Pirates of the Caribbean', 'The Equalizer', 'Nobody', 'The Accountant',
+              'Pick the sixth movie on the action list in your streaming app',
+              'Dealer’s choice – something fast-paced',
+            ],
+          },
+        },
+      },
+      5: {
+        subWheel: {
+          id: 'movie-drama',
+          title: { sv: 'Vilket drama eller vilken klassiker?', en: 'Which drama or classic?' },
+          options: {
+            sv: ['Tom Hanks', 'Övrigt'],
+            en: ['Tom Hanks', 'Other'],
+          },
+          optionSettings: {
+            0: {
+              subWheel: {
+                id: 'movie-drama-tom-hanks',
+                title: { sv: 'Vilken Tom Hanks-film?', en: 'Which Tom Hanks movie?' },
+                options: {
+                  sv: ['Forrest Gump', 'Cast Away', 'The Green Mile', 'Catch Me If You Can', 'The Terminal', 'Saving Private Ryan', 'Sully', 'A Man Called Otto'],
+                  en: ['Forrest Gump', 'Cast Away', 'The Green Mile', 'Catch Me If You Can', 'The Terminal', 'Saving Private Ryan', 'Sully', 'A Man Called Otto'],
+                },
+              },
+            },
+            1: {
+              subWheel: {
+                id: 'movie-drama-other',
+                title: { sv: 'Vilket drama?', en: 'Which drama?' },
+                options: {
+                  sv: [
+                    'The Shawshank Redemption', 'Good Will Hunting', 'Dead Poets Society',
+                    'A Beautiful Mind', 'The Pursuit of Happyness', 'The Intouchables',
+                    'Green Book', 'Rain Man', 'The Truman Show',
+                    'Ta tredje filmen på dramalistan',
+                    'Dealer’s choice – något riktigt bra',
+                  ],
+                  en: [
+                    'The Shawshank Redemption', 'Good Will Hunting', 'Dead Poets Society',
+                    'A Beautiful Mind', 'The Pursuit of Happyness', 'The Intouchables',
+                    'Green Book', 'Rain Man', 'The Truman Show',
+                    'Pick the third movie on the drama list',
+                    'Dealer’s choice – something truly great',
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      6: {
+        subWheel: {
+          id: 'movie-scifi',
+          title: { sv: 'Vilken Sci-Fi-film?', en: 'Which Sci-Fi movie?' },
+          options: {
+            sv: [
+              'Interstellar', 'The Martian', 'Arrival', 'Inception', 'The Matrix',
+              'Blade Runner 2049', 'Dune', 'Dune: Part Two', 'Ex Machina',
+              'Minority Report', 'District 9', 'Ready Player One', 'Back to the Future',
+              'Looper', 'Ta femte filmen på Sci-Fi-listan',
+              'Dealer’s choice – framtiden får bestämma',
+            ],
+            en: [
+              'Interstellar', 'The Martian', 'Arrival', 'Inception', 'The Matrix',
+              'Blade Runner 2049', 'Dune', 'Dune: Part Two', 'Ex Machina',
+              'Minority Report', 'District 9', 'Ready Player One', 'Back to the Future',
+              'Looper', 'Pick the fifth movie on the Sci-Fi list',
+              'Dealer’s choice – let the future decide',
+            ],
+          },
+        },
+      },
+      7: {
+        subWheel: {
+          id: 'movie-fantasy',
+          title: { sv: 'Vilken sorts fantasy?', en: 'What kind of fantasy?' },
+          options: {
+            sv: ['Lord of the Rings', 'Harry Potter', 'Övrigt'],
+            en: ['Lord of the Rings', 'Harry Potter', 'Other'],
+          },
+          optionSettings: {
+            0: {
+              subWheel: {
+                id: 'movie-fantasy-lotr',
+                title: { sv: 'Vilken Lord of the Rings-film?', en: 'Which Lord of the Rings movie?' },
+                options: {
+                  sv: ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'],
+                  en: ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'],
+                },
+              },
+            },
+            1: {
+              subWheel: {
+                id: 'movie-fantasy-harry-potter',
+                title: { sv: 'Vilken Harry Potter-film?', en: 'Which Harry Potter movie?' },
+                options: {
+                  sv: [
+                    'Philosopher’s Stone', 'Chamber of Secrets', 'Prisoner of Azkaban',
+                    'Goblet of Fire', 'Order of the Phoenix', 'Half-Blood Prince',
+                    'Deathly Hallows – Part 1', 'Deathly Hallows – Part 2',
+                  ],
+                  en: [
+                    'Philosopher’s Stone', 'Chamber of Secrets', 'Prisoner of Azkaban',
+                    'Goblet of Fire', 'Order of the Phoenix', 'Half-Blood Prince',
+                    'Deathly Hallows – Part 1', 'Deathly Hallows – Part 2',
+                  ],
+                },
+              },
+            },
+            2: {
+              subWheel: {
+                id: 'movie-fantasy-other',
+                title: { sv: 'Vilken fantasyfilm?', en: 'Which fantasy movie?' },
+                options: {
+                  sv: [
+                    'Stardust', 'The Chronicles of Narnia', 'Pan’s Labyrinth',
+                    'The Princess Bride', 'Fantastic Beasts and Where to Find Them',
+                    'Dealer’s choice – magi tack!',
+                  ],
+                  en: [
+                    'Stardust', 'The Chronicles of Narnia', 'Pan’s Labyrinth',
+                    'The Princess Bride', 'Fantastic Beasts and Where to Find Them',
+                    'Dealer’s choice – something magical!',
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      8: {
+        subWheel: {
+          id: 'movie-family',
+          title: { sv: 'Vilken familjefilm?', en: 'Which family movie?' },
+          options: {
+            sv: [
+              'Toy Story', 'Shrek', 'Ratatouille', 'Up', 'Inside Out', 'Coco', 'Moana',
+              'The Incredibles', 'How to Train Your Dragon', 'Finding Nemo', 'Encanto',
+              'Zootopia', 'Ta fjärde filmen på familjelistan',
+              'Dealer’s choice – något mysigt',
+            ],
+            en: [
+              'Toy Story', 'Shrek', 'Ratatouille', 'Up', 'Inside Out', 'Coco', 'Moana',
+              'The Incredibles', 'How to Train Your Dragon', 'Finding Nemo', 'Encanto',
+              'Zootopia', 'Pick the fourth movie on the family list',
+              'Dealer’s choice – something cosy',
+            ],
+          },
+        },
+      },
+      9: {
+        subWheel: {
+          id: 'movie-swedish',
+          title: { sv: 'Vilken svensk film?', en: 'Which Swedish movie?' },
+          options: {
+            sv: [
+              'Jalla! Jalla!', 'Kopps', 'Fucking Åmål', 'Ondskan', 'Så som i himmelen',
+              'Män som hatar kvinnor', 'Hundraåringen som klev ut genom fönstret och försvann',
+              'En man som heter Ove', 'Tillsammans', 'Smala Sussie',
+              'Tomten är far till alla barnen', 'Sunes sommar', 'Sällskapsresan', 'Jägarna',
+              'Änglagård', 'Patrik 1,5', 'Yrrol', 'Den bästa sommaren', 'Masjävlar',
+              'Adam & Eva', 'Mitt liv som hund', 'Torsk på Tallinn',
+            ],
+            en: [
+              'Jalla! Jalla!', 'Kopps', 'Fucking Åmål', 'Ondskan', 'Så som i himmelen',
+              'Män som hatar kvinnor', 'Hundraåringen som klev ut genom fönstret och försvann',
+              'En man som heter Ove', 'Tillsammans', 'Smala Sussie',
+              'Tomten är far till alla barnen', 'Sunes sommar', 'Sällskapsresan', 'Jägarna',
+              'Änglagård', 'Patrik 1,5', 'Yrrol', 'Den bästa sommaren', 'Masjävlar',
+              'Adam & Eva', 'Mitt liv som hund', 'Torsk på Tallinn',
+            ],
+          },
+        },
+      },
+      10: {
+        winnerNotePool: SHARED_SURPRISE_MOVIE_POOL,
+      },
     },
   },
   {
