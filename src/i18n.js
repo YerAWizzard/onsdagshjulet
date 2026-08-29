@@ -937,8 +937,216 @@ export const templateCatalog = [
     id: 'clean', emoji: '🧹',
     name: { sv: 'Vad ska vi städa först?', en: 'What should we clean first?' },
     options: {
-      sv: ['Köket', 'Badrummet', 'Vardagsrummet', 'Tvätten', 'Sovrummet', 'Skrivbordet'],
-      en: ['Kitchen', 'Bathroom', 'Living room', 'Laundry', 'Bedroom', 'Desk'],
+      sv: [
+        '🍳 Köket',
+        '🚿 Badrummet – Djup rengöring!',
+        '🛋️ Vardagsrummet',
+        '🛏️ Sovrummet',
+        '👕 Tvätten',
+        '🚪 Hallen',
+        '💻 Skrivbord / arbetsyta',
+        '🧺 Förvaring / skåp',
+        '🧹 Golv & ytor',
+        '😅 Hushållets skamvrå',
+      ],
+      en: [
+        '🍳 Kitchen',
+        '🚿 Bathroom – Deep clean!',
+        '🛋️ Living room',
+        '🛏️ Bedroom',
+        '👕 Laundry',
+        '🚪 Hallway',
+        '💻 Desk / workspace',
+        '🧺 Storage / cupboards',
+        '🧹 Floors & surfaces',
+        '😅 The household’s corner of shame',
+      ],
+    },
+    optionSettings: {
+      0: {
+        subWheel: {
+          id: 'clean-kitchen',
+          title: { sv: 'Vad i köket?', en: 'What in the kitchen?' },
+          options: {
+            sv: [
+              'Diskhon',
+              'Diskmaskinen',
+              'Skåpsluckorna!',
+              'Bänkarna',
+              'Spisen',
+              'Kylskåpet',
+              'Golvet',
+              'När fan moppade någon golvet sist?',
+              'Mina maskiner ❤️',
+              'Allt som är kladdigt',
+            ],
+            en: [
+              'The sink',
+              'The dishwasher',
+              'The cabinet doors!',
+              'The counters',
+              'The stove',
+              'The fridge',
+              'The floor',
+              'When the hell did anyone last mop the floor?',
+              'My machines ❤️',
+              'Everything that’s sticky',
+            ],
+          },
+          optionSettings: {
+            8: {
+              subWheel: {
+                id: 'clean-kitchen-machines',
+                title: { sv: 'Vilken maskin?', en: 'Which machine?' },
+                options: {
+                  sv: [
+                    'Kaffemaskinen – smutsigt kaffe = äckligt kaffe',
+                    'Airfryer – fan vad flottig du var då!',
+                    'Brödrost – vem fan har sölat på dig?',
+                    'Övrigt – ta något bara',
+                  ],
+                  en: [
+                    'Coffee machine – dirty coffee = disgusting coffee',
+                    'Air fryer – damn, you got greasy!',
+                    'Toaster – who the hell spilled on you?',
+                    'Other – just pick something',
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      1: {
+        subWheel: {
+          id: 'clean-bathroom',
+          title: { sv: 'Vad i badrummet?', en: 'What in the bathroom?' },
+          options: {
+            sv: ['Handfatet', 'Spegeln', 'Toaletten', 'Duschen', 'Golvet', 'Hyllan', 'Kattlådan', 'Snabb uppfräschning på allt'],
+            en: ['The sink', 'The mirror', 'The toilet', 'The shower', 'The floor', 'The shelf', 'The litter box', 'Give everything a quick refresh'],
+          },
+        },
+      },
+      2: {
+        subWheel: {
+          id: 'clean-living-room',
+          title: { sv: 'Vad i vardagsrummet?', en: 'What in the living room?' },
+          options: {
+            sv: [
+              'Soffbordet – ordentligt, latmask!',
+              'TV-bänken – ja, bakom med!',
+              'Plocka undan – inte “jag gör det sen”',
+              'Dammsuga',
+              'Torka ytor',
+              'När fan moppade någon golvet sist?',
+              'Det som ser stökigast ut',
+            ],
+            en: [
+              'The coffee table – properly, you lazybones!',
+              'The TV stand – yes, behind it too!',
+              'Put things away – no “I’ll do it later”',
+              'Vacuum',
+              'Wipe down surfaces',
+              'When the hell did anyone last mop the floor?',
+              'Whatever looks messiest',
+            ],
+          },
+        },
+      },
+      3: {
+        subWheel: {
+          id: 'clean-bedroom',
+          title: { sv: 'Vad i sovrummet?', en: 'What in the bedroom?' },
+          options: {
+            sv: [
+              'Gör rent i garderoben',
+              'Nattduksbordet – jaha, där var du!',
+              'Dammsuga',
+              'Moppa? Jo men… ja, jo kanske!',
+              'Byta sängkläder',
+              'Snabbfix',
+              'Ta bort allt jävla hår!',
+              'Under sängen – watch out for the monster!',
+              'TV-bänken?',
+            ],
+            en: [
+              'Clean out the wardrobe',
+              'The bedside table – oh, there you are!',
+              'Vacuum',
+              'Mop? Well… yeah, maybe!',
+              'Change the bedding',
+              'Quick fix',
+              'Get rid of all that damn hair!',
+              'Under the bed – watch out for the monster!',
+              'The TV stand?',
+            ],
+          },
+        },
+      },
+      4: {
+        winnerNote: {
+          sv: 'HAH! Du kom lindrigt undan!',
+          en: 'HAH! You got off lightly!',
+        },
+        subWheel: {
+          id: 'clean-laundry',
+          title: { sv: 'Vad med tvätten?', en: 'What about the laundry?' },
+          options: {
+            sv: ['Sortera tvätt', 'Sätta igång en maskin', 'Hänga tvätt', 'Vika tvätt', 'Para strumpor', 'Gå igenom “den där högen”'],
+            en: ['Sort the laundry', 'Start a load', 'Hang up the laundry', 'Fold the laundry', 'Pair up socks', 'Deal with “that pile”'],
+          },
+        },
+      },
+      5: {
+        subWheel: {
+          id: 'clean-hallway',
+          title: { sv: 'Vad i hallen?', en: 'What in the hallway?' },
+          options: {
+            sv: ['Skor och jackor', 'Plocka undan', 'Torka av ytor', 'Moppa – golvet har sett saker…', 'Fixa en garderob!', 'Dammsuga', 'Entré-reset'],
+            en: ['Shoes and jackets', 'Put things away', 'Wipe down surfaces', 'Mop – the floor has seen things…', 'Sort out a closet!', 'Vacuum', 'Entryway reset'],
+          },
+        },
+      },
+      6: {
+        subWheel: {
+          id: 'clean-workspace',
+          title: { sv: 'Vad på arbetsytan?', en: 'What in the workspace?' },
+          options: {
+            sv: ['Rensa papper', 'Torka av bordet', 'Organisera småsaker', 'Kablar och laddare', 'Släng skräp', 'Gör plats för fokus'],
+            en: ['Clear out papers', 'Wipe down the desk', 'Organize small stuff', 'Cables and chargers', 'Throw away rubbish', 'Make room to focus'],
+          },
+        },
+      },
+      7: {
+        subWheel: {
+          id: 'clean-storage',
+          title: { sv: 'Vilken förvaring?', en: 'Which storage space?' },
+          options: {
+            sv: ['Städskåpet', 'Garderoben', 'En låda', 'Kökslådor', 'Badrumsskåpet', 'Ett litet kaoshörn'],
+            en: ['The cleaning cupboard', 'The wardrobe', 'One drawer', 'Kitchen drawers', 'The bathroom cabinet', 'One little chaos corner'],
+          },
+        },
+      },
+      8: {
+        subWheel: {
+          id: 'clean-floors-surfaces',
+          title: { sv: 'Vad tar vi först?', en: 'What should we tackle first?' },
+          options: {
+            sv: ['Dammsuga hela lägenheten', 'Moppa', 'Damma', 'Fläckjakt', 'Ta det som märks mest'],
+            en: ['Vacuum the whole apartment', 'Mop', 'Dust', 'Hunt down stains', 'Tackle whatever stands out most'],
+          },
+        },
+      },
+      9: {
+        subWheel: {
+          id: 'clean-shame-corner',
+          title: { sv: 'Vilken skamvrå?', en: 'Which shameful mess?' },
+          options: {
+            sv: ['Det ni skjutit upp längst', 'Den där högen', 'Det som “vi tar sen”', 'Något som stör båda'],
+            en: ['Whatever you’ve put off the longest', 'That pile', 'The thing “we’ll do later”', 'Something that annoys both of you'],
+          },
+        },
+      },
     },
   },
   {
