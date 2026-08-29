@@ -179,7 +179,7 @@ function App() {
     engine.setEnabled(initialAudio.enabled)
 
     const unlockAudio = () => engine.unlock()
-    window.addEventListener('pointerdown', unlockAudio, { once: true })
+    window.addEventListener('pointerdown', unlockAudio, engine.needsIOSUnlockRecovery() ? undefined : { once: true })
     window.addEventListener('keydown', unlockAudio, { once: true })
 
     return () => {

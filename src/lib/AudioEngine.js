@@ -25,6 +25,11 @@ export const MUSIC_TRACKS = {
 
 export const MUSIC_THEMES = Object.keys(MUSIC_TRACKS)
 const MUSIC_VOLUME_FLOOR_DB = -30
+const isIOSDevice = () => {
+  if (typeof navigator === 'undefined') return false
+  return /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
 const mapMusicVolume = (volume) => {
   if (volume <= 0) return 0
   const decibels = MUSIC_VOLUME_FLOOR_DB * (1 - volume)
@@ -51,6 +56,9 @@ export class AudioEngine {
   constructor() {
     this.context = null
     this.effectsGain = null
+    this.musicGain = null
+    this.musicSource = null
+    this.usesIOSMusicGain = isIOSDevice()
     this.enabled = DEFAULT_MUSIC.enabled
     this.effectsVolume = DEFAULT_MUSIC.effectsVolume
     this.mode = DEFAULT_MUSIC.mode
@@ -64,7 +72,7 @@ export class AudioEngine {
     this.music = new Audio(MUSIC_TRACKS[this.mode][this.trackIndex])
     this.music.loop = true
     this.music.preload = 'auto'
-    this.music.volume = this.volume
+    if (!this.usesIOSMusicGain) this.music.volume = this.volume
   }
 
   activate() {
@@ -79,7 +87,19 @@ export class AudioEngine {
     this.effectsGain = this.context.createGain()
     this.effectsGain.gain.value = 0.52 * this.effectsVolume
     this.effectsGain.connect(this.context.destination)
+    if (this.usesIOSMusicGain) {
+      this.musicSource = this.context.createMediaElementSource(this.music)
+      this.musicGain = this.context.createGain()
+      const playbackVolume = this.isMusicDucked ? mapDuckedMusicVolume(this.volume) : this.volume
+      this.musicGain.gain.value = mapMusicVolume(playbackVolume)
+      this.musicSource.connect(this.musicGain)
+      this.musicGain.connect(this.context.destination)
+    }
     return true
+  }
+
+  needsIOSUnlockRecovery() {
+    return this.usesIOSMusicGain
   }
 
   unlock() {
@@ -142,15 +162,24 @@ export class AudioEngine {
     const targetVolume = Math.min(1, Math.max(0, Number(volume) || 0))
     if (this.volumeAnimationFrame) cancelAnimationFrame(this.volumeAnimationFrame)
     this.volumeAnimationFrame = null
+    const setPlaybackVolume = (nextVolume) => {
+      if (this.usesIOSMusicGain) {
+        if (this.musicGain) this.musicGain.gain.value = nextVolume
+        return
+      }
+      this.music.volume = nextVolume
+    }
     if (!duration) {
-      this.music.volume = targetVolume
+      setPlaybackVolume(targetVolume)
       return
     }
-    const startVolume = this.music.volume
+    const startVolume = this.usesIOSMusicGain
+      ? (this.musicGain?.gain.value ?? targetVolume)
+      : this.music.volume
     const startedAt = performance.now()
     const animateVolume = (currentTime) => {
       const progress = Math.min((currentTime - startedAt) / duration, 1)
-      this.music.volume = startVolume + (targetVolume - startVolume) * progress
+      setPlaybackVolume(startVolume + (targetVolume - startVolume) * progress)
       if (progress < 1) {
         this.volumeAnimationFrame = requestAnimationFrame(animateVolume)
       } else {
@@ -247,8 +276,12 @@ export class AudioEngine {
     this.music.pause()
     this.music.removeAttribute('src')
     this.music.load()
+    this.musicSource?.disconnect()
+    this.musicGain?.disconnect()
     this.context?.close()
     this.context = null
     this.effectsGain = null
+    this.musicGain = null
+    this.musicSource = null
   }
 }
