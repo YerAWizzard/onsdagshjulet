@@ -638,14 +638,18 @@
   }
 }
 
-@media (max-width: 1000px) and (max-height: 500px) {
+@media (orientation: landscape) and (max-width: 1100px) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   .wheel-engine {
     padding: 0.25rem 0.4rem 1rem;
   }
 
   .wheel-visual {
-    width: min(70vw, 92svh, 520px);
+    width: min(70vw, calc(100svh - 8.125rem), 520px);
     max-width: 100%;
+  }
+
+  .wheel-context + .wheel-engine .wheel-visual {
+    width: min(70vw, calc(100svh - 11rem), 520px);
   }
 
   .wheel-pointer {
@@ -654,12 +658,12 @@
 
   .spin-button {
     min-height: 3.45rem;
-    margin-top: 0.75rem;
+    margin-top: 0.625rem;
   }
 
   .wheel-result {
-    min-height: 7.5rem;
-    padding: 0.75rem;
+    min-height: 5.5rem;
+    padding: 0.5rem 0.75rem;
   }
 }
 
