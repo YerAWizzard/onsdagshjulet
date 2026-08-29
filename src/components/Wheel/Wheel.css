@@ -644,12 +644,12 @@
   }
 
   .wheel-visual {
-    width: min(70vw, calc(100svh - 8.125rem), 520px);
+    width: min(100%, calc(100svh - 8.125rem), 520px);
     max-width: 100%;
   }
 
   .wheel-context + .wheel-engine .wheel-visual {
-    width: min(70vw, calc(100svh - 11rem), 520px);
+    width: min(100%, calc(100svh - 11rem), 520px);
   }
 
   .wheel-pointer {
@@ -657,8 +657,16 @@
   }
 
   .spin-button {
-    min-height: 3.45rem;
-    margin-top: 0.625rem;
+    width: min(100%, 18rem);
+    min-height: 2.85rem;
+    margin-top: 0.45rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .spin-button span {
+    font-size: 1.05rem;
   }
 
   .wheel-result {
