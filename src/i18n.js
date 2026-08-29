@@ -388,13 +388,13 @@ export const templateCatalog = [
       ],
       en: [
         'Cook something seriously good',
-        'Movie & couch mode',
-        'KÖPOTEKET!',
-        'GRAND TOUR OF FIKA',
+        'Movie & couch mode 🍿',
+        'Purchasing spree!',
+        'GRAND TOUR OF COFFEE & CAKE',
         "We're eating out – absolutely no cooking tonight! 😎",
-        'Culture points – museum!',
-        'Cinema with everything',
-        'Get out into nature',
+        'Culture points – museum time!',
+        'Cinema with everything! 🎟️',
+        'Get out into nature! 🌲',
         'Surprise overnight stay',
         'GAME NIGHT',
         'Everyday adventures',
@@ -408,7 +408,7 @@ export const templateCatalog = [
           title: { sv: 'Vad ska vi se?', en: 'What should we watch?' },
           options: {
             sv: ['100-filmer-planschen 🎬', 'Komedi', 'Sci-Fi', '90s', '00s', '10s', '20s', 'Dealers Choice'],
-            en: ['100 movies poster', 'Comedy', 'Sci-Fi', '90s', '00s', '10s', '20s', 'Dealers Choice'],
+            en: ['100-movie poster 🎬', 'Comedy', 'Sci-Fi', '90s', '00s', '10s', '20s', "Dealer's Choice"],
           },
           optionSettings: {
             7: {
@@ -434,10 +434,10 @@ export const templateCatalog = [
       3: {
         subWheel: {
           id: 'favorite-fika',
-          title: { sv: 'Var fikar vi?', en: 'Where should we have fika?' },
+          title: { sv: 'Var fikar vi?', en: 'Where should we grab coffee?' },
           options: {
             sv: ['Prova något nytt!', 'Gammal favorit!', 'Gångavstånd! 🚶', 'Kattcafé 🐈', 'Rooftop'],
-            en: ['Try something new!', 'Old favorite!', 'Walking distance!', 'Cat café', 'Rooftop'],
+            en: ['Try something new!', 'Old favorite!', 'Walking distance! 🚶', 'Cat café 🐈', 'Rooftop'],
           },
         },
       },
@@ -447,7 +447,7 @@ export const templateCatalog = [
           title: { sv: 'Var ska vi äta?', en: 'Where should we eat?' },
           options: {
             sv: ['Prova något nytt!', 'Tapas', 'Bar Minimal', 'Asiatiskt', 'Pizza', 'HAMBORGOR!!', 'Dealers Choice', 'Rooftop'],
-            en: ['Try something new!', 'Tapas', 'Bar Minimal', 'Asian', 'Pizza', 'BURGERS!!', 'Dealers Choice', 'Rooftop'],
+            en: ['Try something new!', 'Tapas', 'Bar Minimal', 'Asian', 'Pizza', 'BURGERS!!', "Dealer's Choice", 'Rooftop'],
           },
           optionSettings: {
             1: {
@@ -478,7 +478,7 @@ export const templateCatalog = [
           title: { sv: 'Vilken övernattning?', en: 'What kind of overnight stay?' },
           options: {
             sv: ['Spa', 'Pool', 'I Göteborg', 'Naturnära', 'Vibes luxe!'],
-            en: ['Spa', 'Pool', 'In Gothenburg', 'Close to nature', 'Vibes luxe!'],
+            en: ['Spa', 'Pool', 'In Gothenburg', 'Close to nature', 'Luxury vibes!'],
           },
         },
       },
@@ -510,16 +510,425 @@ export const templateCatalog = [
     id: 'eat', emoji: '🍕',
     name: { sv: 'Vad ska vi äta?', en: 'What should we eat?' },
     options: {
-      sv: ['Pizza', 'Tacos', 'Sushi', 'Pasta', 'Hamburgare', 'Sallad', 'Thaimat', 'Hämtmat'],
-      en: ['Pizza', 'Tacos', 'Sushi', 'Pasta', 'Burgers', 'Salad', 'Thai', 'Takeout'],
+      sv: [
+        '🍕 Pizza',
+        '🌮 Tacos',
+        '🍣 Sushi',
+        '🍝 Pasta',
+        '🐟 Fisk',
+        '🍔 Hamburgare',
+        '🥙 Kebab',
+        '🍛 Asiatiskt',
+        '🍲 Husmanskost',
+        '🥗 Något lätt!',
+        '🥣 Soppa',
+        '🥘 Grytor',
+      ],
+      en: [
+        '🍕 Pizza',
+        '🌮 Tacos',
+        '🍣 Sushi',
+        '🍝 Pasta',
+        '🐟 Fish',
+        '🍔 Burgers',
+        '🥙 Kebab',
+        '🍛 Asian',
+        '🍲 Comfort food',
+        '🥗 Something light!',
+        '🥣 Soup',
+        '🥘 Stews',
+      ],
+    },
+    optionSettings: {
+      0: {
+        subWheel: {
+          id: 'eat-pizza',
+          title: { sv: 'Vilken pizza?', en: 'Which pizza?' },
+          options: {
+            sv: ['Varma mackor är pizza!', 'Kvarterspizza – vem pallar laga mat!', 'Tortilla, ketchup & skinka!'],
+            en: ['Hot sandwiches are pizza!', 'Neighborhood pizza – who can be bothered to cook!', 'Tortilla, ketchup & ham!'],
+          },
+        },
+      },
+      3: {
+        subWheel: {
+          id: 'eat-pasta',
+          title: { sv: 'Vilken pasta?', en: 'Which pasta?' },
+          options: {
+            sv: ['Carbonara', 'Bolognese', 'Pesto', 'Lasagne', 'Krämig pasta', 'Testa något nytt'],
+            en: ['Carbonara', 'Bolognese', 'Pesto', 'Lasagna', 'Creamy pasta', 'Try something new'],
+          },
+        },
+      },
+      4: {
+        subWheel: {
+          id: 'eat-fish',
+          title: { sv: 'Vilken fiskrätt?', en: 'Which fish dish?' },
+          options: {
+            sv: ['Lax', 'Vit fisk', 'Fiskpinnar / Fiskbullar', 'Fiskburgare', 'Fisksoppa'],
+            en: ['Salmon', 'White fish', 'Fish fingers / Fish balls', 'Fish burger', 'Fish soup'],
+          },
+          optionSettings: {
+            0: { percentage: '25' },
+            1: { percentage: '25' },
+            2: { percentage: '20' },
+            3: { percentage: '10' },
+            4: { percentage: '20' },
+          },
+        },
+      },
+      5: {
+        subWheel: {
+          id: 'eat-burgers',
+          title: { sv: 'Vilken hamburgare?', en: 'Which burger?' },
+          options: {
+            sv: ['Hemmagjorda', 'Finburgare', 'Snabbkäk'],
+            en: ['Homemade', 'Gourmet burgers', 'Fast food'],
+          },
+          optionSettings: {
+            2: {
+              subWheel: {
+                id: 'eat-burgers-fast-food',
+                title: { sv: 'Vilket snabbkäk?', en: 'Which fast food?' },
+                options: {
+                  sv: ['Donken', 'Skurhink', 'Burger King'],
+                  en: ["McDonald's", 'Chooses freely', 'Burger King'],
+                },
+              },
+            },
+          },
+        },
+      },
+      7: {
+        subWheel: {
+          id: 'eat-asian',
+          title: { sv: 'Vilket asiatiskt?', en: 'Which Asian food?' },
+          options: {
+            sv: ['Thai', 'Indiskt', 'Kinesiskt', 'Vietnamesiskt'],
+            en: ['Thai', 'Indian', 'Chinese', 'Vietnamese'],
+          },
+        },
+      },
+      8: {
+        subWheel: {
+          id: 'eat-comfort-food',
+          title: { sv: 'Vilken husmanskost?', en: 'Which comfort food?' },
+          options: {
+            sv: ['Raggmunk', 'Stekt falukorv', 'Ärtsoppa & pannkakor', 'Köttbullar med mos', 'Korvstroganoff', 'Pytt i panna', 'Hushållets favorit'],
+            en: ['Swedish potato pancakes', 'Fried Swedish sausage', 'Pea soup & pancakes', 'Meatballs with mashed potatoes', 'Sausage stroganoff', 'Swedish hash', 'Household favorite'],
+          },
+        },
+      },
+      9: {
+        subWheel: {
+          id: 'eat-light',
+          title: { sv: 'Vad blir det för något lätt?', en: 'What light meal should we have?' },
+          options: {
+            sv: ['Färdigt i kylen?', 'Färdigt i frysen?', 'Färdigt i skafferiet?', 'Bröd är middag, eller?', 'Girl dinner (plockmat)'],
+            en: ['Ready in the fridge?', 'Ready in the freezer?', 'Ready in the pantry?', 'Bread counts as dinner, right?', 'Girl dinner (snack plate)'],
+          },
+        },
+      },
+      10: {
+        subWheel: {
+          id: 'eat-soup',
+          title: { sv: 'Vilken soppa?', en: 'Which soup?' },
+          options: {
+            sv: ['Ärtsoppa', 'Morotssoppa', 'Tomatsoppa med bacon', 'Fisksoppa med lax & torsk', 'Nötfärssoppa', 'Gulasch', 'Potatis- och baconsoppa'],
+            en: ['Pea soup', 'Carrot soup', 'Tomato soup with bacon', 'Fish soup with salmon & cod', 'Ground beef soup', 'Goulash', 'Potato and bacon soup'],
+          },
+        },
+      },
+      11: {
+        subWheel: {
+          id: 'eat-stews',
+          title: { sv: 'Vilken gryta?', en: 'Which stew?' },
+          options: {
+            sv: ['Chorizo- och paprikagryta', 'Kikärtsgryta', 'Kycklinggryta', 'Chili con carne', 'Linser & kokosmjölk', 'Halloumi- och majsgryta', 'Tacogryta', 'Hushållets hemliga recept'],
+            en: ['Chorizo and pepper stew', 'Chickpea stew', 'Chicken stew', 'Chili con carne', 'Lentils & coconut milk', 'Halloumi and corn stew', 'Taco stew', "The household's secret recipe"],
+          },
+          optionSettings: {
+            2: {
+              subWheel: {
+                id: 'eat-stews-chicken',
+                title: { sv: 'Vilken kycklinggryta?', en: 'Which chicken stew?' },
+                options: {
+                  sv: ['Curry', 'Paprika & grädde', 'Tomat & örter', 'Kokos & lime'],
+                  en: ['Curry', 'Bell pepper & cream', 'Tomato & herbs', 'Coconut & lime'],
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   {
     id: 'do', emoji: '🎈',
     name: { sv: 'Vad ska vi göra?', en: 'What should we do?' },
     options: {
-      sv: ['Ta en promenad', 'Spelkväll', 'Besök ett café', 'Bada', 'Ring en vän', 'Prova något nytt'],
-      en: ['Take a walk', 'Game night', 'Visit a café', 'Go swimming', 'Call a friend', 'Try something new'],
+      sv: [
+        '🚶 Ta en promenad',
+        '🎲 Spelkväll',
+        '☕ Besök ett café',
+        '🏊 Bada',
+        '✨ Prova något nytt',
+        '🎬 Film / bio',
+        '🚗 Åk någonstans',
+        '🏠 Gör något hemma',
+        '🎯 Aktivitet',
+        '🍻 Ut på stan',
+      ],
+      en: [
+        '🚶 Take a walk',
+        '🎲 Game night',
+        '☕ Visit a café',
+        '🏊 Go swimming',
+        '✨ Try something new',
+        '🎬 Movie / cinema',
+        '🚗 Go somewhere',
+        '🏠 Do something at home',
+        '🎯 Activity',
+        '🍻 Night on the town',
+      ],
+    },
+    optionSettings: {
+      0: {
+        subWheel: {
+          id: 'do-walk',
+          title: { sv: 'Vart går vi?', en: 'Where should we walk?' },
+          options: {
+            sv: ['Bara gå!', 'Naturreservat', 'Stadspromenad', 'Promenad + fika', 'Gå någonstans du aldrig varit'],
+            en: ['Just walk!', 'Nature reserve', 'Walk around town', 'Walk + coffee', "Go somewhere you've never been"],
+          },
+        },
+      },
+      1: {
+        subWheel: {
+          id: 'do-game-night',
+          title: { sv: 'Vad spelar vi?', en: 'What should we play?' },
+          options: {
+            sv: ['Brädspel', 'Kortspel', 'TV-/konsolspel', 'Quiz', 'Något vi inte spelat på länge'],
+            en: ['Board game', 'Card game', 'TV/console game', 'Quiz', "Something we haven't played in ages"],
+          },
+        },
+      },
+      2: {
+        subWheel: {
+          id: 'do-cafe',
+          title: { sv: 'Vad blir det för café?', en: "What's the café plan?" },
+          options: {
+            sv: ['Favoritstället', 'Testa ett nytt', 'Café + promenad', 'Bakelse måste ingå!'],
+            en: ['Our favorite place', 'Try a new one', 'Café + walk', 'Pastry is mandatory!'],
+          },
+        },
+      },
+      3: {
+        subWheel: {
+          id: 'do-swim',
+          title: { sv: 'Var badar vi?', en: 'Where should we swim?' },
+          options: {
+            sv: ['Simhall', 'Sjö/hav', 'Spa!'],
+            en: ['Indoor pool', 'Lake/sea', 'Spa!'],
+          },
+          optionSettings: {
+            1: {
+              winnerNote: {
+                sv: 'Bara om vädret är rimligt 😄',
+                en: 'Only if the weather is reasonable 😄',
+              },
+            },
+          },
+        },
+      },
+      4: {
+        subWheel: {
+          id: 'do-something-new',
+          title: { sv: 'Vad testar vi?', en: 'What should we try?' },
+          options: {
+            sv: ['Ny restaurang', 'Ny aktivitet', 'Ny plats', 'Något vi sagt ”någon gång” om'],
+            en: ['New restaurant', 'New activity', 'New place', 'Something we keep saying we’ll do “someday”'],
+          },
+        },
+      },
+      5: {
+        subWheel: {
+          id: 'do-movie',
+          title: { sv: 'Vad ska vi se?', en: 'What should we watch?' },
+          options: {
+            sv: ['Netflix and chill?', 'Bio!'],
+            en: ['Netflix and chill?', 'Cinema!'],
+          },
+          optionSettings: {
+            0: {
+              subWheel: {
+                id: 'do-movie-at-home',
+                title: { sv: 'Vad blir det?', en: 'What are we watching?' },
+                options: {
+                  sv: ['Något vi aldrig skulle valt själva', 'En gammal favorit', '3:e rekommendationen på rad 4!', 'Komedi!', 'Sci-Fi', 'Surprise me!'],
+                  en: ["Something we'd never choose ourselves", 'An old favorite', 'The 3rd pick in row 4!', 'Comedy!', 'Sci-Fi', 'Surprise me!'],
+                },
+                optionSettings: {
+                  5: {
+                    winnerNotePool: [
+                      'The Shawshank Redemption',
+                      'The Godfather',
+                      'The Dark Knight',
+                      'The Godfather Part II',
+                      'The Lord of the Rings: The Return of the King',
+                      '12 Angry Men',
+                      "Schindler's List",
+                      'The Lord of the Rings: The Fellowship of the Ring',
+                      'Pulp Fiction',
+                      'The Good, the Bad and the Ugly',
+                      'The Lord of the Rings: The Two Towers',
+                      'Forrest Gump',
+                      'Fight Club',
+                      'Inception',
+                      'Star Wars: Episode V - The Empire Strikes Back',
+                      'The Matrix',
+                      'Interstellar',
+                      'GoodFellas',
+                      "One Flew Over the Cuckoo's Nest",
+                      'Seven',
+                      "It's a Wonderful Life",
+                      'The Silence of the Lambs',
+                      'Saving Private Ryan',
+                      'Seven Samurai',
+                      'The Green Mile',
+                      'City of God',
+                      'Life Is Beautiful',
+                      'Terminator 2: Judgment Day',
+                      'Back to the Future',
+                      'Star Wars: Episode IV - A New Hope',
+                      'Kill Bill: The Whole Bloody Affair',
+                      'Spirited Away',
+                      'Gladiator',
+                      'The Pianist',
+                      'Parasite',
+                      'Grave of the Fireflies',
+                      'Harakiri',
+                      'Psycho',
+                      'The Lion King',
+                      'The Departed',
+                      'Whiplash',
+                      'The Prestige',
+                      'American History X',
+                      'Spider-Man: Across the Spider-Verse',
+                      'Léon: The Professional',
+                      'Cinema Paradiso',
+                      'Casablanca',
+                      'The Intouchables',
+                      'The Usual Suspects',
+                      'Django Unchained',
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      6: {
+        subWheel: {
+          id: 'do-go-somewhere',
+          title: { sv: 'Vart åker vi?', en: 'Where are we going?' },
+          options: {
+            sv: ['Ta bilen och välj en riktning', 'Far till grannbyn!', 'Hitta ett utsiktsställe', 'Mini-roadtrip'],
+            en: ['Pick a direction and drive', 'Off to the next town!', 'Find a scenic viewpoint', 'Mini road trip'],
+          },
+          optionSettings: {
+            0: {
+              subWheel: {
+                id: 'do-go-somewhere-direction',
+                title: { sv: 'Vilken riktning?', en: 'Which direction?' },
+                options: {
+                  sv: ['Norr', 'Söder', 'Väst', 'Öst'],
+                  en: ['North', 'South', 'West', 'East'],
+                },
+              },
+            },
+            3: {
+              subWheel: {
+                id: 'do-go-somewhere-roadtrip',
+                title: { sv: 'Hur lång?', en: 'How long?' },
+                options: {
+                  sv: ['30 min', '1 timme', '2 timmar', '3 timmar'],
+                  en: ['30 min', '1 hour', '2 hours', '3 hours'],
+                },
+                optionSettings: {
+                  0: { percentage: '40' },
+                  1: { percentage: '40' },
+                  2: { percentage: '15' },
+                  3: { percentage: '5' },
+                },
+              },
+            },
+          },
+        },
+      },
+      7: {
+        subWheel: {
+          id: 'do-at-home',
+          title: { sv: 'Vad gör vi hemma?', en: 'What should we do at home?' },
+          options: {
+            sv: ['Temakväll hemma', 'Baka något helt onödigt', 'Pussel / Lego', 'Myskväll deluxe'],
+            en: ['Theme night at home', 'Bake something completely unnecessary', 'Puzzle / Lego', 'Deluxe cozy night'],
+          },
+          optionSettings: {
+            0: {
+              subWheel: {
+                id: 'do-at-home-theme',
+                title: { sv: 'Vilket tema?', en: 'Which theme?' },
+                options: {
+                  sv: ['Filmtema', 'Speltema', 'Mat från ett land', 'Nostalgikväll'],
+                  en: ['Movie theme', 'Game theme', 'Food from another country', 'Nostalgia night'],
+                },
+              },
+            },
+          },
+        },
+      },
+      8: {
+        subWheel: {
+          id: 'do-activity',
+          title: { sv: 'Vilken aktivitet?', en: 'Which activity?' },
+          options: {
+            sv: ['Escape room', 'Bowling', 'Dart', 'Biljard', 'Minigolf', 'Shuffleboard', 'Klättring / bouldering'],
+            en: ['Escape room', 'Bowling', 'Darts', 'Pool', 'Mini golf', 'Shuffleboard', 'Climbing / bouldering'],
+          },
+          optionSettings: {
+            6: {
+              winnerNote: {
+                sv: 'Eller gå till ett utsiktsställe',
+                en: 'Or go to a scenic viewpoint',
+              },
+            },
+          },
+        },
+      },
+      9: {
+        subWheel: {
+          id: 'do-night-out',
+          title: { sv: 'Vad gör vi på stan?', en: 'What should we do in town?' },
+          options: {
+            sv: ['Gå runt som ett mähä!', 'Kulturellt ska det vara!', 'Ta ett glas någonstans', 'Testa ett nytt ställe'],
+            en: ['Wander around like a lovable fool!', "Let's get cultural!", 'Grab a drink somewhere', 'Try a new place'],
+          },
+          optionSettings: {
+            1: {
+              subWheel: {
+                id: 'do-night-out-culture',
+                title: { sv: 'Vilken kulturpoäng?', en: 'What kind of culture?' },
+                options: {
+                  sv: ['Museum', 'Teater', 'Konsert / live-musik', 'Galleri / utställning'],
+                  en: ['Museum', 'Theater', 'Concert / live music', 'Gallery / exhibition'],
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   {

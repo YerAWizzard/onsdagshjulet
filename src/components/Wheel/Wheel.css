@@ -441,6 +441,13 @@
   text-shadow: 0 0 10px #ffd166, 0 0 28px rgba(255, 79, 163, 0.72), 0 0 44px rgba(41, 215, 255, 0.35);
 }
 
+.wheel-result__note {
+  color: rgba(255, 249, 204, 0.82);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 650;
+  line-height: 1.2;
+}
+
 .wheel-result--star strong {
   color: #fffde0;
   text-shadow: 0 0 12px #fff, 0 0 28px #ffd166, 0 0 52px #ff4fa3, 0 0 72px #29d7ff;

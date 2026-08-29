@@ -47,13 +47,27 @@ function loadFocusMode() {
   }
 }
 
-const createOption = (label, star = false, percentage = '', subWheel = null) => ({
+const createOption = (
+  label,
+  star = false,
+  percentage = '',
+  subWheel = null,
+  winnerNote = '',
+  winnerNotePool = [],
+) => ({
   id: `option-${optionId += 1}`,
   label,
   percentage,
   star,
   ...(subWheel ? { subWheel } : {}),
+  ...(winnerNote ? { winnerNote } : {}),
+  ...(winnerNotePool.length ? { winnerNotePool } : {}),
 })
+
+function normalizeWinnerNotePool(winnerNotePool) {
+  if (!Array.isArray(winnerNotePool)) return []
+  return winnerNotePool.map((note) => String(note ?? '').trim()).filter(Boolean)
+}
 
 function hydrateSubWheel(subWheel) {
   if (!subWheel || !Array.isArray(subWheel.options)) return null
@@ -62,6 +76,8 @@ function hydrateSubWheel(subWheel) {
     Boolean(option.star),
     option.percentage ?? '',
     hydrateSubWheel(option.subWheel),
+    String(option.winnerNote ?? ''),
+    normalizeWinnerNotePool(option.winnerNotePool),
   ))
   while (hydratedOptions.length < 2) hydratedOptions.push(createOption(''))
   return {
@@ -76,11 +92,20 @@ function serializeSubWheel(subWheel) {
   return {
     id: subWheel.id,
     title: subWheel.title,
-    options: subWheel.options.map(({ label, percentage = '', star = false, subWheel: nestedSubWheel }) => ({
+    options: subWheel.options.map(({
+      label,
+      percentage = '',
+      star = false,
+      subWheel: nestedSubWheel,
+      winnerNote = '',
+      winnerNotePool = [],
+    }) => ({
       label,
       percentage,
       star,
       ...(nestedSubWheel ? { subWheel: serializeSubWheel(nestedSubWheel) } : {}),
+      ...(winnerNote ? { winnerNote } : {}),
+      ...(winnerNotePool.length ? { winnerNotePool } : {}),
     })),
   }
 }
@@ -96,6 +121,17 @@ function findSubWheelById(options, subWheelId) {
   return null
 }
 
+function localizeWinnerNote(winnerNote, locale) {
+  return typeof winnerNote === 'object' ? winnerNote?.[locale] : winnerNote
+}
+
+function localizeWinnerNotePool(winnerNotePool, locale) {
+  const localizedPool = Array.isArray(winnerNotePool)
+    ? winnerNotePool
+    : winnerNotePool?.[locale]
+  return normalizeWinnerNotePool(localizedPool)
+}
+
 function localizeSubWheel(subWheel, locale) {
   if (!subWheel) return null
   return {
@@ -103,26 +139,37 @@ function localizeSubWheel(subWheel, locale) {
     title: subWheel.title[locale],
     options: subWheel.options[locale].map((label, index) => {
       const optionSettings = subWheel.optionSettings?.[index] ?? {}
+      const {
+        winnerNote: winnerNoteConfig,
+        winnerNotePool: winnerNotePoolConfig,
+        ...localizedSettings
+      } = optionSettings
       const nestedSubWheel = localizeSubWheel(optionSettings.subWheel, locale)
+      const winnerNote = localizeWinnerNote(winnerNoteConfig, locale)
+      const winnerNotePool = localizeWinnerNotePool(winnerNotePoolConfig, locale)
       return {
         label,
-        ...optionSettings,
+        ...localizedSettings,
+        ...(winnerNote ? { winnerNote } : {}),
+        ...(winnerNotePool.length ? { winnerNotePool } : {}),
         ...(nestedSubWheel ? { subWheel: nestedSubWheel } : {}),
       }
     }),
   }
 }
 
-const DEFAULT_OPTIONS = [
-  createOption('Pizza'),
-  createOption('Hamburgare'),
-  createOption('Sushi'),
-  createOption('Tacos'),
-  createOption('Pasta'),
-  createOption('Kyckling'),
-  createOption('Sallad'),
-  createOption('Kebab'),
-]
+const DEFAULT_TEMPLATE = templateCatalog.find((template) => template.id === 'do')
+const DEFAULT_OPTIONS = DEFAULT_TEMPLATE.options.sv.map((label, index) => {
+  const optionSettings = DEFAULT_TEMPLATE.optionSettings?.[index] ?? {}
+  return createOption(
+    label,
+    Boolean(optionSettings.star),
+    optionSettings.percentage ?? '',
+    hydrateSubWheel(localizeSubWheel(optionSettings.subWheel, 'sv')),
+    localizeWinnerNote(optionSettings.winnerNote, 'sv'),
+    localizeWinnerNotePool(optionSettings.winnerNotePool, 'sv'),
+  )
+})
 
 function hydrateOptions(options) {
   return options.slice(0, 30).map((option) =>
@@ -131,6 +178,8 @@ function hydrateOptions(options) {
       Boolean(option.star),
       option.percentage ?? '',
       hydrateSubWheel(option.subWheel),
+      String(option.winnerNote ?? ''),
+      normalizeWinnerNotePool(option.winnerNotePool),
     ),
   )
 }
@@ -223,11 +272,23 @@ function App() {
       id: template.id,
       emoji: template.emoji,
       name: template.name[locale],
-      options: template.options[locale].map((label, index) => ({
-        label,
-        ...(template.optionSettings?.[index] ?? {}),
-        subWheel: localizeSubWheel(template.optionSettings?.[index]?.subWheel, locale),
-      })),
+      options: template.options[locale].map((label, index) => {
+        const optionSettings = template.optionSettings?.[index] ?? {}
+        const {
+          winnerNote: winnerNoteConfig,
+          winnerNotePool: winnerNotePoolConfig,
+          ...localizedSettings
+        } = optionSettings
+        const winnerNote = localizeWinnerNote(winnerNoteConfig, locale)
+        const winnerNotePool = localizeWinnerNotePool(winnerNotePoolConfig, locale)
+        return {
+          label,
+          ...localizedSettings,
+          ...(winnerNote ? { winnerNote } : {}),
+          ...(winnerNotePool.length ? { winnerNotePool } : {}),
+          subWheel: localizeSubWheel(optionSettings.subWheel, locale),
+        }
+      }),
     })),
     [locale],
   )
@@ -281,8 +342,21 @@ function App() {
 
   const confirmTemplate = () => {
     if (!pendingTemplate) return
-    setOptions(pendingTemplate.options.map(({ label, percentage = '', star = false, subWheel }) =>
-      createOption(label, star, percentage, hydrateSubWheel(subWheel))))
+    setOptions(pendingTemplate.options.map(({
+      label,
+      percentage = '',
+      star = false,
+      subWheel,
+      winnerNote = '',
+      winnerNotePool = [],
+    }) => createOption(
+      label,
+      star,
+      percentage,
+      hydrateSubWheel(subWheel),
+      winnerNote,
+      normalizeWinnerNotePool(winnerNotePool),
+    )))
     setRuntimePath([])
     setSelectedTemplate(pendingTemplate.id)
     setPendingTemplate(null)
@@ -311,11 +385,20 @@ function App() {
         volume: audio.volume,
       },
       locale,
-      options: options.map(({ label, percentage, star, subWheel }) => ({
+      options: options.map(({
+        label,
+        percentage,
+        star,
+        subWheel,
+        winnerNote = '',
+        winnerNotePool = [],
+      }) => ({
         label,
         percentage,
         star,
         ...(subWheel ? { subWheel: serializeSubWheel(subWheel) } : {}),
+        ...(winnerNote ? { winnerNote } : {}),
+        ...(winnerNotePool.length ? { winnerNotePool } : {}),
       })),
       selectedMusic: audio.mode,
       savedAt: nextSavedAt,

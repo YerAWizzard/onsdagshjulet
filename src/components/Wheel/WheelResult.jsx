@@ -34,6 +34,9 @@ function WheelResult({ onDone, onSpinAgain, showSubWheelActions, t, winner }) {
             {winner.star ? t('wheel.starPrize') : t('wheel.winner')}
           </span>
           <strong>{winner.label}</strong>
+          {winner.winnerNote ? (
+            <span className="wheel-result__note">{winner.winnerNote}</span>
+          ) : null}
           {showSubWheelActions ? (
             <div className="wheel-result__actions">
               <button className="wheel-result__continue" onClick={onSpinAgain} type="button">

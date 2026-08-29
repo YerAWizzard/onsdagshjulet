@@ -53,7 +53,17 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
   const handleSpinComplete = useCallback(
     (winnerIndex) => {
       const winningOption = playableOptions[winnerIndex]
-      const result = { ...winningOption, winId: `${Date.now()}-${Math.random()}` }
+      const winnerNotePool = Array.isArray(winningOption.winnerNotePool)
+        ? winningOption.winnerNotePool
+        : []
+      const winnerNote = winnerNotePool.length
+        ? winnerNotePool[Math.floor(Math.random() * winnerNotePool.length)]
+        : winningOption.winnerNote
+      const result = {
+        ...winningOption,
+        ...(winnerNote ? { winnerNote } : {}),
+        winId: `${Date.now()}-${Math.random()}`,
+      }
       setWinner(result)
       audioEngine.restoreMusic(2000)
       audioEngine.playWin(result.star)
