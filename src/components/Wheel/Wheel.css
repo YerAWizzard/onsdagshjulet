@@ -682,12 +682,32 @@
   }
 }
 
+.app-shell[data-performance-mode='full'] .wheel-visual::before {
+  animation: ring-spin 24s linear infinite;
+  animation-play-state: running;
+}
+
+.app-shell[data-performance-mode='full'] .wheel-engine:not(.is-spinning) .wheel-visual:not(.wheel-visual--normal-win):not(.wheel-visual--star-win) .wheel-bulb {
+  animation: bulb-pulse 0.9s ease-in-out var(--bulb-delay) infinite alternate;
+  animation-play-state: running;
+  filter: none;
+  box-shadow: none;
+}
+
+.app-shell[data-performance-mode='full'] .spin-button:not(:disabled)::after {
+  animation: spin-idle-glow 2.4s ease-in-out infinite alternate;
+  animation-play-state: running;
+  opacity: 0.45;
+  transform: none;
+}
+
 .app-shell[data-performance-mode='balanced'] .wheel-visual::before {
   animation: none;
 }
 
 .app-shell[data-performance-mode='balanced'] .wheel-engine.is-spinning .wheel-visual::before {
   animation: ring-spin 24s linear infinite;
+  animation-play-state: running;
 }
 
 .app-shell[data-performance-mode='balanced'] .wheel-bulb {
@@ -748,6 +768,20 @@
 .app-shell[data-document-hidden='true'] .winner-confetti i,
 .app-shell[data-document-hidden='true'] .star-burst {
   animation-play-state: paused !important;
+}
+
+.app-shell[data-document-hidden='false'] .wheel-visual::before,
+.app-shell[data-document-hidden='false'] .wheel-bulb,
+.app-shell[data-document-hidden='false'] .spin-button::after,
+.app-shell[data-document-hidden='false'] .wheel-visual--normal-win,
+.app-shell[data-document-hidden='false'] .wheel-visual--star-win,
+.app-shell[data-document-hidden='false'] .wheel-countdown strong,
+.app-shell[data-document-hidden='false'] .wheel-result__content,
+.app-shell[data-document-hidden='false'] .wheel-result--winner,
+.app-shell[data-document-hidden='false'] .wheel-result--star,
+.app-shell[data-document-hidden='false'] .winner-confetti i,
+.app-shell[data-document-hidden='false'] .star-burst {
+  animation-play-state: running;
 }
 
 @media (prefers-reduced-motion: reduce) {

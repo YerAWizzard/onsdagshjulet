@@ -29,6 +29,13 @@
   animation: ambient-drift 16s ease-in-out infinite alternate;
 }
 
+.app-shell[data-performance-mode='full'] .background-glow {
+  animation: ambient-drift 16s ease-in-out infinite alternate;
+  animation-play-state: running;
+  opacity: 1;
+  transform: none;
+}
+
 .app-shell[data-performance-mode='balanced'] .background-glow,
 .app-shell[data-performance-mode='energy-saver'] .background-glow {
   animation: none;
@@ -38,6 +45,10 @@
 
 .app-shell[data-document-hidden='true'] .background-glow {
   animation-play-state: paused !important;
+}
+
+.app-shell[data-document-hidden='false'] .background-glow {
+  animation-play-state: running;
 }
 
 .app-header {

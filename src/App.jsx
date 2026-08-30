@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import AboutPopover from './components/AboutPopover.jsx'
 import CollapsibleSection from './components/ControlPanel/CollapsibleSection.jsx'
@@ -260,10 +260,17 @@ function App() {
     sessionStorage.setItem(FOCUS_MODE_KEY, String(isFocusMode))
   }, [isFocusMode])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const syncDocumentVisibility = () => setIsDocumentHidden(document.hidden)
+    syncDocumentVisibility()
     document.addEventListener('visibilitychange', syncDocumentVisibility)
-    return () => document.removeEventListener('visibilitychange', syncDocumentVisibility)
+    window.addEventListener('focus', syncDocumentVisibility)
+    window.addEventListener('pageshow', syncDocumentVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', syncDocumentVisibility)
+      window.removeEventListener('focus', syncDocumentVisibility)
+      window.removeEventListener('pageshow', syncDocumentVisibility)
+    }
   }, [])
 
   useEffect(() => {
@@ -495,7 +502,7 @@ function App() {
   return (
     <div
       className={`app-shell${isFocusMode ? ' app-shell--focus' : ''}`}
-      data-document-hidden={isDocumentHidden ? 'true' : undefined}
+      data-document-hidden={isDocumentHidden ? 'true' : 'false'}
       data-performance-mode={performanceMode}
     >
       <div className="background-glow" aria-hidden="true" />
