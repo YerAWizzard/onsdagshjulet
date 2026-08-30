@@ -123,11 +123,19 @@ export const translations = {
       },
     },
     spinSettings: {
-      title: 'Snurrinställningar',
+      title: 'Hjulinställningar',
       help: 'Välj hur kort eller länge hjulet kan snurra. Varje snurr får en slumpad tid inom intervallet.',
       minimum: 'Minsta snurrtid',
       maximum: 'Längsta snurrtid',
       seconds: '{{value}} sek',
+    },
+    performance: {
+      label: 'Prestanda',
+      modes: {
+        balanced: 'Balanserad',
+        full: 'Standard',
+        'energy-saver': 'Energisparläge',
+      },
     },
     templates: {
       title: 'Inspiration & färdiga hjul',
@@ -306,11 +314,19 @@ export const translations = {
       },
     },
     spinSettings: {
-      title: 'Spin settings',
+      title: 'Wheel settings',
       help: 'Choose how briefly or how long the wheel may spin. Each spin gets a random duration within the range.',
       minimum: 'Minimum spin time',
       maximum: 'Maximum spin time',
       seconds: '{{value}} sec',
+    },
+    performance: {
+      label: 'Performance',
+      modes: {
+        balanced: 'Balanced',
+        full: 'Standard',
+        'energy-saver': 'Energy saver',
+      },
     },
     templates: {
       title: 'Inspiration & ready-made wheels',

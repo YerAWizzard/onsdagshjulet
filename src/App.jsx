@@ -13,6 +13,10 @@ import { createTranslator, templateCatalog } from './i18n.js'
 import { AudioEngine, DEFAULT_MUSIC, MUSIC_TRACKS } from './lib/AudioEngine.js'
 import { loadMusicPreferences, saveMusicPreferences } from './lib/musicStorage.js'
 import { calculateProbabilities } from './lib/probability.js'
+import {
+  loadPerformanceMode,
+  savePerformanceMode,
+} from './lib/performanceStorage.js'
 import { APP_VERSION } from './version.js'
 import {
   deleteSession,
@@ -211,6 +215,8 @@ function App() {
   const [sessionConfirmation, setSessionConfirmation] = useState(null)
   const [sessionMessage, setSessionMessage] = useState('')
   const [spinSettings, setSpinSettings] = useState({ minSeconds: 3, maxSeconds: 11 })
+  const [performanceMode, setPerformanceMode] = useState(loadPerformanceMode)
+  const [isDocumentHidden, setIsDocumentHidden] = useState(() => document.hidden)
   const audioEngineRef = useRef(null)
   const initialAudioRef = useRef(audio)
   const settingsSectionRef = useRef(null)
@@ -253,6 +259,12 @@ function App() {
   useEffect(() => {
     sessionStorage.setItem(FOCUS_MODE_KEY, String(isFocusMode))
   }, [isFocusMode])
+
+  useEffect(() => {
+    const syncDocumentVisibility = () => setIsDocumentHidden(document.hidden)
+    document.addEventListener('visibilitychange', syncDocumentVisibility)
+    return () => document.removeEventListener('visibilitychange', syncDocumentVisibility)
+  }, [])
 
   useEffect(() => {
     if (!templateScrollRequest) return undefined
@@ -339,6 +351,10 @@ function App() {
       return next
     })
   }
+
+  const updatePerformanceMode = useCallback((mode) => {
+    setPerformanceMode(savePerformanceMode(mode))
+  }, [])
 
   const confirmTemplate = () => {
     if (!pendingTemplate) return
@@ -477,7 +493,11 @@ function App() {
   }
 
   return (
-    <div className={`app-shell${isFocusMode ? ' app-shell--focus' : ''}`}>
+    <div
+      className={`app-shell${isFocusMode ? ' app-shell--focus' : ''}`}
+      data-document-hidden={isDocumentHidden ? 'true' : undefined}
+      data-performance-mode={performanceMode}
+    >
       <div className="background-glow" aria-hidden="true" />
 
       <main className={`workspace${isFocusMode ? ' workspace--focus' : ''}`}>
@@ -568,7 +588,13 @@ function App() {
           </CollapsibleSection>
 
           <CollapsibleSection accentClass="card-accent--pink" className="spin-card" collapsed={collapsedSections.spin} icon="settings" id="spin-settings" onToggle={() => toggleSection('spin')} title={t('spinSettings.title')}>
-            <SpinSettings {...spinSettings} onChange={(updates) => setSpinSettings((current) => ({ ...current, ...updates }))} t={t} />
+            <SpinSettings
+              {...spinSettings}
+              onChange={(updates) => setSpinSettings((current) => ({ ...current, ...updates }))}
+              onPerformanceModeChange={updatePerformanceMode}
+              performanceMode={performanceMode}
+              t={t}
+            />
           </CollapsibleSection>
 
           <CollapsibleSection

@@ -29,6 +29,17 @@
   animation: ambient-drift 16s ease-in-out infinite alternate;
 }
 
+.app-shell[data-performance-mode='balanced'] .background-glow,
+.app-shell[data-performance-mode='energy-saver'] .background-glow {
+  animation: none;
+  opacity: 0.86;
+  transform: none;
+}
+
+.app-shell[data-document-hidden='true'] .background-glow {
+  animation-play-state: paused !important;
+}
+
 .app-header {
   position: relative;
   margin-bottom: 0.25rem;
@@ -1282,6 +1293,7 @@
 .panel-button,
 .session-actions button,
 .music-modes button,
+.performance-modes button,
 .audio-toggle {
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 0.72rem;
@@ -1297,6 +1309,7 @@
 .panel-button:hover:not(:disabled),
 .session-actions button:hover:not(:disabled),
 .music-modes button:hover,
+.performance-modes button:hover,
 .audio-toggle:hover {
   filter: brightness(1.12);
 }
@@ -1401,6 +1414,38 @@
 }
 
 .music-modes button.is-active {
+  color: #291700;
+  border-color: rgba(255, 235, 153, 0.55);
+  background: linear-gradient(180deg, #fff1a4, #ffbc26);
+}
+
+.performance-setting {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.performance-setting > strong {
+  color: #eee9f6;
+  font-size: 0.78rem;
+}
+
+.performance-modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.performance-modes button {
+  min-height: 2.25rem;
+  padding: 0.4rem 0.35rem;
+  font-size: 0.69rem;
+  line-height: 1.15;
+}
+
+.performance-modes button.is-active {
   color: #291700;
   border-color: rgba(255, 235, 153, 0.55);
   background: linear-gradient(180deg, #fff1a4, #ffbc26);

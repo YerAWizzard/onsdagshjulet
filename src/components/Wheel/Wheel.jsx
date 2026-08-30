@@ -105,7 +105,7 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
   const isBusy = isCountingDown || isSpinning
 
   return (
-    <div className="wheel-engine">
+    <div className={`wheel-engine${isSpinning ? ' is-spinning' : ''}`}>
       <div className="wheel-stage">
         <div className={`wheel-visual${winner ? winner.star ? ' wheel-visual--star-win' : ' wheel-visual--normal-win' : ''}`}>
         <div className="wheel-bulbs" aria-hidden="true">

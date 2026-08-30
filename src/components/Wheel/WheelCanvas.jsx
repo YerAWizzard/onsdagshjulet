@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
 } from 'react'
 import {
@@ -123,7 +124,7 @@ const WheelCanvas = forwardRef(function WheelCanvas(
     celebrationFrameRef.current = requestAnimationFrame(animateCelebration)
   }, [renderWheel])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return undefined
 
@@ -133,11 +134,16 @@ const WheelCanvas = forwardRef(function WheelCanvas(
     }
     celebrationRef.current = null
 
-    const resizeCanvas = () => {
+    let lastRenderedSize = null
+
+    const resizeCanvas = ({ force = false } = {}) => {
       const bounds = canvas.getBoundingClientRect()
       const size = Math.max(1, Math.min(bounds.width, bounds.height))
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 4)
       const bitmapSize = Math.round(size * pixelRatio)
+
+      if (!force && lastRenderedSize === `${size}:${bitmapSize}`) return
+      lastRenderedSize = `${size}:${bitmapSize}`
 
       if (canvas.width !== bitmapSize || canvas.height !== bitmapSize) {
         canvas.width = bitmapSize
@@ -161,10 +167,12 @@ const WheelCanvas = forwardRef(function WheelCanvas(
       renderWheel()
     }
 
-    const resizeObserver = new ResizeObserver(resizeCanvas)
+    const resizeObserver = new ResizeObserver(() => resizeCanvas())
     resizeObserver.observe(canvas)
     resizeCanvas()
-    document.fonts?.load('700 48px Fredoka').then(resizeCanvas)
+    if (document.fonts && !document.fonts.check('700 48px Fredoka')) {
+      document.fonts.load('700 48px Fredoka').then(() => resizeCanvas({ force: true }))
+    }
 
     return () => resizeObserver.disconnect()
   }, [items, renderWheel])

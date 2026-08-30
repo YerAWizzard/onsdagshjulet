@@ -1,4 +1,13 @@
-function SpinSettings({ maxSeconds, minSeconds, onChange, t }) {
+import { PERFORMANCE_MODES } from '../../lib/performanceStorage.js'
+
+function SpinSettings({
+  maxSeconds,
+  minSeconds,
+  onChange,
+  onPerformanceModeChange,
+  performanceMode,
+  t,
+}) {
   return (
     <div className="settings-content spin-settings">
       <p className="panel-help">{t('spinSettings.help')}</p>
@@ -12,6 +21,22 @@ function SpinSettings({ maxSeconds, minSeconds, onChange, t }) {
         <input max="11" min="2" onChange={(event) => onChange({ maxSeconds: Math.max(Number(event.target.value), minSeconds) })} type="range" value={maxSeconds} />
         <strong>{t('spinSettings.seconds', { value: maxSeconds })}</strong>
       </label>
+      <div className="performance-setting">
+        <strong>{t('performance.label')}</strong>
+        <div aria-label={t('performance.label')} className="performance-modes" role="group">
+          {PERFORMANCE_MODES.map((mode) => (
+            <button
+              aria-pressed={performanceMode === mode}
+              className={performanceMode === mode ? 'is-active' : ''}
+              key={mode}
+              onClick={() => onPerformanceModeChange(mode)}
+              type="button"
+            >
+              {t(`performance.modes.${mode}`)}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

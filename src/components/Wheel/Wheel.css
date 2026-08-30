@@ -682,6 +682,74 @@
   }
 }
 
+.app-shell[data-performance-mode='balanced'] .wheel-visual::before {
+  animation: none;
+}
+
+.app-shell[data-performance-mode='balanced'] .wheel-engine.is-spinning .wheel-visual::before {
+  animation: ring-spin 24s linear infinite;
+}
+
+.app-shell[data-performance-mode='balanced'] .wheel-bulb {
+  filter: brightness(1.08);
+  box-shadow: 0 0 10px currentColor;
+}
+
+.app-shell[data-performance-mode='balanced'] .wheel-engine:not(.is-spinning) .wheel-visual:not(.wheel-visual--normal-win):not(.wheel-visual--star-win) .wheel-bulb {
+  animation: none;
+}
+
+.app-shell[data-performance-mode='balanced'] .spin-button::after {
+  animation: none;
+  opacity: 0.45;
+  transform: none;
+}
+
+.app-shell[data-performance-mode='balanced'] .spin-button:disabled::after,
+.app-shell[data-performance-mode='energy-saver'] .spin-button:disabled::after {
+  opacity: 0.1;
+}
+
+.app-shell[data-performance-mode='energy-saver'] .wheel-visual::before,
+.app-shell[data-performance-mode='energy-saver'] .wheel-bulb,
+.app-shell[data-performance-mode='energy-saver'] .spin-button::after,
+.app-shell[data-performance-mode='energy-saver'] .wheel-visual--normal-win,
+.app-shell[data-performance-mode='energy-saver'] .wheel-visual--star-win,
+.app-shell[data-performance-mode='energy-saver'] .wheel-visual--normal-win .wheel-bulb,
+.app-shell[data-performance-mode='energy-saver'] .wheel-visual--star-win .wheel-bulb,
+.app-shell[data-performance-mode='energy-saver'] .wheel-countdown strong,
+.app-shell[data-performance-mode='energy-saver'] .wheel-result__content,
+.app-shell[data-performance-mode='energy-saver'] .wheel-result--winner,
+.app-shell[data-performance-mode='energy-saver'] .wheel-result--star,
+.app-shell[data-performance-mode='energy-saver'] .winner-confetti i,
+.app-shell[data-performance-mode='energy-saver'] .star-burst {
+  animation: none;
+}
+
+.app-shell[data-performance-mode='energy-saver'] .wheel-bulb {
+  filter: brightness(1);
+  box-shadow: 0 0 7px currentColor;
+}
+
+.app-shell[data-performance-mode='energy-saver'] .spin-button::after {
+  opacity: 0.34;
+  transform: none;
+}
+
+.app-shell[data-document-hidden='true'] .wheel-visual::before,
+.app-shell[data-document-hidden='true'] .wheel-bulb,
+.app-shell[data-document-hidden='true'] .spin-button::after,
+.app-shell[data-document-hidden='true'] .wheel-visual--normal-win,
+.app-shell[data-document-hidden='true'] .wheel-visual--star-win,
+.app-shell[data-document-hidden='true'] .wheel-countdown strong,
+.app-shell[data-document-hidden='true'] .wheel-result__content,
+.app-shell[data-document-hidden='true'] .wheel-result--winner,
+.app-shell[data-document-hidden='true'] .wheel-result--star,
+.app-shell[data-document-hidden='true'] .winner-confetti i,
+.app-shell[data-document-hidden='true'] .star-burst {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wheel-visual::before,
   .wheel-bulb,

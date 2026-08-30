@@ -140,8 +140,13 @@ function measureLabelLayout(context, lines, trailingEmoji, fontSize) {
 function fitLineCount(context, words, trailingEmoji, lineCount, geometry) {
   context.font = '700 100px Fredoka, sans-serif'
   const lines = balancedLines(context, words, lineCount)
+  let smallestStep = 4
+  let largestStep = 152
+  let bestFit = null
 
-  for (let fontSize = 76; fontSize >= 2; fontSize -= 0.5) {
+  while (smallestStep <= largestStep) {
+    const step = Math.floor((smallestStep + largestStep) / 2)
+    const fontSize = step / 2
     const measurements = measureLabelLayout(
       context,
       lines,
@@ -150,7 +155,10 @@ function fitLineCount(context, words, trailingEmoji, lineCount, geometry) {
     )
     const halfHeight = measurements.blockHeight / 2
     const outerEdgeSquared = geometry.outerSafeRadius ** 2 - halfHeight ** 2
-    if (outerEdgeSquared <= 0) continue
+    if (outerEdgeSquared <= 0) {
+      largestStep = step - 1
+      continue
+    }
 
     // Anchor each candidate against the wheel arc. The wedge is narrowest at
     // the candidate's inner edge, so that corner determines slice containment.
@@ -162,17 +170,20 @@ function fitLineCount(context, words, trailingEmoji, lineCount, geometry) {
       innerEdge >= geometry.innerSafeRadius
       && halfHeight + geometry.sliceMargin <= availableHalfHeight
     ) {
-      return {
+      bestFit = {
         ...measurements,
         fontSize,
         lines,
         textRadius: outerEdge - measurements.contentWidth / 2,
         trailingEmoji,
       }
+      smallestStep = step + 1
+    } else {
+      largestStep = step - 1
     }
   }
 
-  return null
+  return bestFit
 }
 
 function fitCanvasLabel(context, text, geometry) {
@@ -228,6 +239,7 @@ export function drawWheel(context, items, visualOrder) {
   const innerRadius = size * 0.105
   const segmentCount = visualOrder.length
   const step = (Math.PI * 2) / segmentCount
+  const labelLayouts = new Map()
 
   context.clearRect(0, 0, size, size)
 
@@ -264,12 +276,16 @@ export function drawWheel(context, items, visualOrder) {
     context.fillRect(0, 0, size, size)
 
     const label = item.label
-    const labelLayout = fitCanvasLabel(context, label, {
-      halfStepTangent: Math.tan(step / 2),
-      innerSafeRadius: innerRadius + 18,
-      outerSafeRadius: outerRadius - 14,
-      sliceMargin: 5,
-    })
+    let labelLayout = labelLayouts.get(label)
+    if (!labelLayout) {
+      labelLayout = fitCanvasLabel(context, label, {
+        halfStepTangent: Math.tan(step / 2),
+        innerSafeRadius: innerRadius + 18,
+        outerSafeRadius: outerRadius - 14,
+        sliceMargin: 5,
+      })
+      labelLayouts.set(label, labelLayout)
+    }
     const fontSize = Math.round(labelLayout.fontSize * 10) / 10
 
     context.translate(centerX, centerY)
