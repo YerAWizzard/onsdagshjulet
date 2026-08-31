@@ -36,21 +36,19 @@
 }
 
 .wheel-visual--normal-win {
-  animation: wheel-win-glow 1.35s ease-out;
+  animation: wheel-win-glow 1.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wheel-visual--star-win {
-  animation: wheel-star-shimmer 1.65s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: wheel-star-shimmer 1.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.wheel-visual--normal-win .wheel-bulb,
-.wheel-visual--star-win .wheel-bulb {
-  animation: winner-bulb-flash 180ms ease-in-out var(--bulb-delay) 6 alternate;
+.wheel-visual--normal-win .wheel-bulb {
+  animation: winner-bulb-sweep 680ms ease-out var(--victory-delay) 1 both;
 }
 
 .wheel-visual--star-win .wheel-bulb {
-  animation-duration: 115ms;
-  animation-iteration-count: 10;
+  animation: star-bulb-sweep 880ms cubic-bezier(0.16, 1, 0.3, 1) var(--star-victory-delay) 1 both;
 }
 
 .wheel-visual::before {
@@ -320,13 +318,29 @@
 .wheel-result--winner {
   border-color: rgba(255, 209, 102, 0.66);
   box-shadow: 0 0 38px rgba(255, 79, 163, 0.28), 0 0 58px rgba(41, 215, 255, 0.16);
-  animation: normal-panel-glow 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: normal-panel-glow 1.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wheel-result--star {
   border-color: #ffe47e;
   box-shadow: 0 0 28px rgba(255, 209, 102, 0.7), 0 0 65px rgba(255, 79, 163, 0.4), 0 0 90px rgba(41, 215, 255, 0.22);
-  animation: star-panel-pulse 310ms ease-in-out 8 alternate, star-panel-arrive 720ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: star-panel-arrive 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wheel-result--winner::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(112deg, transparent 28%, rgba(255, 255, 255, 0.12) 48%, rgba(255, 209, 102, 0.16) 54%, transparent 72%);
+  content: '';
+  pointer-events: none;
+  transform: translateX(-115%);
+  animation: winner-card-sheen 1.15s 120ms ease-out both;
+}
+
+.wheel-result--star::before {
+  background: linear-gradient(112deg, transparent 24%, rgba(255, 249, 196, 0.2) 45%, rgba(255, 209, 102, 0.34) 52%, transparent 76%);
+  animation-duration: 1.45s;
 }
 
 .wheel-result__placeholder {
@@ -349,12 +363,17 @@
 
 .wheel-result__content {
   position: relative;
+  z-index: 1;
   display: flex;
   width: 100%;
   flex-direction: column;
   align-items: center;
   gap: 0.45rem;
-  animation: result-arrive 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: result-arrive 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wheel-result--star .wheel-result__content {
+  animation: star-result-arrive 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .wheel-result__actions {
@@ -425,6 +444,27 @@
   box-shadow: 0 0 9px #ffd44f;
 }
 
+.winner-star-sparkles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.winner-star-sparkles i {
+  position: absolute;
+  top: var(--sparkle-top);
+  left: var(--sparkle-left);
+  width: 0.72rem;
+  aspect-ratio: 1;
+  clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 79% 100%, 50% 76%, 21% 100%, 30% 60%, 0 38%, 38% 36%);
+  background: #fff7b0;
+  filter: drop-shadow(0 0 5px rgba(255, 209, 102, 0.9));
+  opacity: 0;
+  transform: translate3d(0, 0.65rem, 0) scale(0.25) rotate(var(--sparkle-rotation));
+  animation: winner-star-sparkle 1.35s cubic-bezier(0.16, 1, 0.3, 1) var(--sparkle-delay) both;
+}
+
 .wheel-result__label {
   color: #fff0a5;
   font-size: 0.78rem;
@@ -458,7 +498,7 @@
   font-size: 1.1rem;
   letter-spacing: 0.35em;
   text-shadow: 0 0 12px #ffd166;
-  animation: star-burst 240ms ease-in-out 6 alternate both;
+  animation: star-burst 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes ring-spin {
@@ -480,22 +520,39 @@
 @keyframes result-arrive {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(0.4rem) scale(0.965);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-0.08rem) scale(1.012);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes star-burst {
-  from { opacity: 0.62; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1.12); }
+  0% { opacity: 0; transform: translateY(0.35rem) scale(0.45) rotate(-8deg); }
+  42% { opacity: 1; transform: translateY(0) scale(1.22) rotate(3deg); }
+  100% { opacity: 0.88; transform: scale(1) rotate(0); }
 }
 
-@keyframes star-panel-pulse {
-  from { filter: brightness(1); }
-  to { filter: brightness(1.2); }
+@keyframes star-result-arrive {
+  0% { opacity: 0; transform: translateY(0.6rem) scale(0.88); }
+  58% { opacity: 1; transform: translateY(-0.12rem) scale(1.045); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes winner-card-sheen {
+  from { transform: translateX(-115%); }
+  to { transform: translateX(115%); }
+}
+
+@keyframes winner-star-sparkle {
+  0% { opacity: 0; transform: translate3d(0, 0.65rem, 0) scale(0.25) rotate(var(--sparkle-rotation)); }
+  28% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--sparkle-drift-x), var(--sparkle-drift-y), 0) scale(1.12) rotate(calc(var(--sparkle-rotation) + 150deg)); }
 }
 
 @keyframes countdown-pop {
@@ -522,15 +579,18 @@
 }
 
 @keyframes wheel-star-shimmer {
-  0%, 100% { filter: none; transform: translateX(0); }
-  12% { transform: translateX(-2px) rotate(-0.15deg); }
-  24% { transform: translateX(2px) rotate(0.15deg); }
-  48% { filter: brightness(1.24) saturate(1.18); box-shadow: 0 0 0 8px #4b2b13, 0 0 75px rgba(255, 218, 83, 0.85), 0 0 115px rgba(255, 79, 163, 0.55); }
+  0%, 100% { filter: none; transform: scale(1); }
+  46% { filter: brightness(1.2) saturate(1.16); box-shadow: 0 0 0 8px #4b2b13, 0 0 78px rgba(255, 218, 83, 0.88), 0 0 118px rgba(255, 79, 163, 0.54); transform: scale(1.008); }
 }
 
-@keyframes winner-bulb-flash {
-  from { filter: brightness(0.85); box-shadow: 0 0 5px currentColor; }
-  to { filter: brightness(2); box-shadow: 0 0 24px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1.3); }
+@keyframes winner-bulb-sweep {
+  0%, 100% { filter: brightness(1.05); box-shadow: 0 0 8px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1); }
+  46% { filter: brightness(1.8); box-shadow: 0 0 21px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1.24); }
+}
+
+@keyframes star-bulb-sweep {
+  0%, 100% { filter: brightness(1.08); box-shadow: 0 0 9px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1); }
+  42% { filter: brightness(2.2); box-shadow: 0 0 29px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1.42); }
 }
 
 @keyframes normal-panel-glow {
@@ -742,6 +802,8 @@
 .app-shell[data-performance-mode='energy-saver'] .wheel-result--winner,
 .app-shell[data-performance-mode='energy-saver'] .wheel-result--star,
 .app-shell[data-performance-mode='energy-saver'] .winner-confetti i,
+.app-shell[data-performance-mode='energy-saver'] .winner-star-sparkles i,
+.app-shell[data-performance-mode='energy-saver'] .wheel-result--winner::before,
 .app-shell[data-performance-mode='energy-saver'] .star-burst {
   animation: none;
 }
@@ -766,6 +828,8 @@
 .app-shell[data-document-hidden='true'] .wheel-result--winner,
 .app-shell[data-document-hidden='true'] .wheel-result--star,
 .app-shell[data-document-hidden='true'] .winner-confetti i,
+.app-shell[data-document-hidden='true'] .winner-star-sparkles i,
+.app-shell[data-document-hidden='true'] .wheel-result--winner::before,
 .app-shell[data-document-hidden='true'] .star-burst {
   animation-play-state: paused !important;
 }
@@ -780,6 +844,8 @@
 .app-shell[data-document-hidden='false'] .wheel-result--winner,
 .app-shell[data-document-hidden='false'] .wheel-result--star,
 .app-shell[data-document-hidden='false'] .winner-confetti i,
+.app-shell[data-document-hidden='false'] .winner-star-sparkles i,
+.app-shell[data-document-hidden='false'] .wheel-result--winner::before,
 .app-shell[data-document-hidden='false'] .star-burst {
   animation-play-state: running;
 }
@@ -788,6 +854,8 @@
   .wheel-visual::before,
   .wheel-bulb,
   .wheel-result__content,
+  .wheel-result--winner::before,
+  .winner-star-sparkles i,
   .star-burst,
   .wheel-result--star {
     animation: none;

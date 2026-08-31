@@ -14,6 +14,8 @@ const BULBS = Array.from({ length: 44 }, (_, index) => ({
   angle: `${(index * 360) / 44}deg`,
   color: FESTIVAL_PALETTE[index % FESTIVAL_PALETTE.length],
   delay: `${(index % 7) * 0.07}s`,
+  starVictoryDelay: `${index * 0.012}s`,
+  victoryDelay: `${index * 0.018}s`,
 }))
 
 function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilityError, spinSettings, t }) {
@@ -117,6 +119,8 @@ function Wheel({ audioEngine, onOpenSubWheel, options, probabilities, probabilit
                 '--bulb-color': bulb.color,
                 '--bulb-delay': bulb.delay,
                 '--bulb-angle': bulb.angle,
+                '--star-victory-delay': bulb.starVictoryDelay,
+                '--victory-delay': bulb.victoryDelay,
               }}
             />
           ))}

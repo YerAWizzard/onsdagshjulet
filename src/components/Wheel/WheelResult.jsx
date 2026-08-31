@@ -6,6 +6,15 @@ const CONFETTI = Array.from({ length: 34 }, (_, index) => ({
   rotation: `${(index * 47) % 180}deg`,
 }))
 
+const STAR_SPARKLES = Array.from({ length: 16 }, (_, index) => ({
+  delay: `${(index % 8) * 0.055}s`,
+  driftX: `${((index * 29) % 70) - 35}px`,
+  driftY: `${-18 - ((index * 17) % 30)}px`,
+  left: `${8 + ((index * 31) % 84)}%`,
+  rotation: `${(index * 43) % 180}deg`,
+  top: `${10 + ((index * 47) % 76)}%`,
+}))
+
 function WheelResult({ onDone, onSpinAgain, showSubWheelActions, t, winner }) {
   return (
     <div
@@ -29,6 +38,23 @@ function WheelResult({ onDone, onSpinAgain, showSubWheelActions, t, winner }) {
               />
             ))}
           </div>
+          {winner.star ? (
+            <div className="winner-star-sparkles" aria-hidden="true">
+              {STAR_SPARKLES.map((sparkle, index) => (
+                <i
+                  key={index}
+                  style={{
+                    '--sparkle-delay': sparkle.delay,
+                    '--sparkle-drift-x': sparkle.driftX,
+                    '--sparkle-drift-y': sparkle.driftY,
+                    '--sparkle-left': sparkle.left,
+                    '--sparkle-rotation': sparkle.rotation,
+                    '--sparkle-top': sparkle.top,
+                  }}
+                />
+              ))}
+            </div>
+          ) : null}
           {winner.star ? <div className="star-burst" aria-hidden="true">★　★　★</div> : null}
           <span className="wheel-result__label">
             {winner.star ? t('wheel.starPrize') : t('wheel.winner')}
