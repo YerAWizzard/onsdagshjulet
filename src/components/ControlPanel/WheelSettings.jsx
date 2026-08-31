@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { calculateProbabilities, formatProbability } from '../../lib/probability.js'
 
 let subOptionId = 0
@@ -25,14 +25,29 @@ function WheelSettings({
   const [sparklingStarId, setSparklingStarId] = useState(null)
   const [expandedSubWheels, setExpandedSubWheels] = useState({})
   const [minimumChoiceConfirmation, setMinimumChoiceConfirmation] = useState(null)
+  const probabilityDescriptionId = useId()
+  const probabilityErrorId = useId()
   const probabilityInputRef = useRef(null)
+  const probabilityTriggerRef = useRef(null)
+  const restoreProbabilityFocusRef = useRef(false)
   const minimumChoiceCancelRef = useRef(null)
   const optionInputRefs = useRef(new Map())
   const pendingNewOptionFocusRef = useRef(null)
   const sparkleTimerRef = useRef(null)
 
   useEffect(() => {
-    if (probabilityEditor) probabilityInputRef.current?.focus()
+    if (probabilityEditor) {
+      probabilityInputRef.current?.focus()
+      return undefined
+    }
+    if (!restoreProbabilityFocusRef.current) return undefined
+    const animationFrame = requestAnimationFrame(() => {
+      if (probabilityTriggerRef.current?.isConnected) {
+        probabilityTriggerRef.current.focus({ preventScroll: true })
+      }
+      restoreProbabilityFocusRef.current = false
+    })
+    return () => cancelAnimationFrame(animationFrame)
   }, [probabilityEditor])
 
   useEffect(() => () => clearTimeout(sparkleTimerRef.current), [])
@@ -60,9 +75,15 @@ function WheelSettings({
     return () => cancelAnimationFrame(animationFrame)
   }, [options])
 
-  const openProbabilityControl = (option) => {
+  const closeProbabilityControl = () => {
+    restoreProbabilityFocusRef.current = true
+    setProbabilityEditor(null)
+  }
+
+  const openProbabilityControl = (option, trigger) => {
+    probabilityTriggerRef.current = trigger
     if (probabilityEditor?.id === option.id) {
-      setProbabilityEditor(null)
+      closeProbabilityControl()
       return
     }
     setProbabilityEditor({
@@ -74,7 +95,7 @@ function WheelSettings({
 
   const setAutomaticProbability = (option, updateOption) => {
     if (String(option.percentage ?? '').trim() !== '') updateOption({ percentage: '' })
-    setProbabilityEditor(null)
+    closeProbabilityControl()
   }
 
   const toggleStarPrize = (option, updateOption) => {
@@ -91,7 +112,7 @@ function WheelSettings({
     const normalizedValue = String(Number(probabilityEditor.draft.replace(',', '.')))
     const previousValue = String(option.percentage ?? '').replace(',', '.')
     if (normalizedValue !== previousValue) updateOption({ percentage: normalizedValue })
-    setProbabilityEditor(null)
+    closeProbabilityControl()
   }
 
   const updateProbabilityDraft = (value) => {
@@ -197,7 +218,7 @@ function WheelSettings({
           aria-label={accessibleName}
           className={`probability-trigger${hasExplicitPercentage ? ' is-active' : ''}`}
           data-tooltip={t('settings.adjustWinChance')}
-          onClick={() => openProbabilityControl(option)}
+          onClick={(event) => openProbabilityControl(option, event.currentTarget)}
           type="button"
         >
           <span aria-hidden="true">{triggerLabel}</span>
@@ -215,7 +236,7 @@ function WheelSettings({
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault()
-            setProbabilityEditor(null)
+            closeProbabilityControl()
           }
         }}
         onSubmit={(event) => {
@@ -227,6 +248,8 @@ function WheelSettings({
         <label className="probability-value-field">
           <input
             ref={probabilityInputRef}
+            aria-describedby={`${probabilityDescriptionId}${editorError ? ` ${probabilityErrorId}` : ''}`}
+            aria-errormessage={editorError ? probabilityErrorId : undefined}
             aria-invalid={Boolean(editorError)}
             aria-label={inputLabel}
             autoComplete="off"
@@ -243,14 +266,15 @@ function WheelSettings({
           />
           <span aria-hidden="true">%</span>
         </label>
+        <span className="visually-hidden" id={probabilityDescriptionId}>{t('settings.percentageRange')}</span>
         <div className="probability-editor-actions">
           <button disabled={Boolean(draftError)} type="submit">{t('settings.saveProbability')}</button>
-          <button onClick={() => setProbabilityEditor(null)} type="button">{t('settings.cancelProbability')}</button>
+          <button onClick={closeProbabilityControl} type="button">{t('settings.cancelProbability')}</button>
         </div>
         <button className="probability-use-auto" onClick={() => setAutomaticProbability(option, updateOption)} type="button">
           {t('settings.useAutomatic')}
         </button>
-        {editorError ? <p className="probability-editor-error" role="alert">{editorError}</p> : null}
+        {editorError ? <p className="probability-editor-error" id={probabilityErrorId} role="alert">{editorError}</p> : null}
       </form>
     )
   }

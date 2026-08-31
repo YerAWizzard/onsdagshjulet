@@ -217,11 +217,29 @@ function App() {
   const [spinSettings, setSpinSettings] = useState({ minSeconds: 3, maxSeconds: 11 })
   const [performanceMode, setPerformanceMode] = useState(loadPerformanceMode)
   const [isDocumentHidden, setIsDocumentHidden] = useState(() => document.hidden)
+  const appShellRef = useRef(null)
   const audioEngineRef = useRef(null)
   const initialAudioRef = useRef(audio)
   const settingsSectionRef = useRef(null)
 
   if (!audioEngineRef.current) audioEngineRef.current = new AudioEngine()
+
+  useEffect(() => {
+    const setFocusModality = (modality) => {
+      appShellRef.current?.setAttribute('data-focus-modality', modality)
+    }
+    const handlePointerDown = () => setFocusModality('pointer')
+    const handleKeyDown = (event) => {
+      if (['Alt', 'Control', 'Meta', 'Shift'].includes(event.key)) return
+      setFocusModality('keyboard')
+    }
+    window.addEventListener('pointerdown', handlePointerDown, true)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown, true)
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [])
 
   useEffect(() => {
     const engine = audioEngineRef.current
@@ -501,8 +519,10 @@ function App() {
 
   return (
     <div
+      ref={appShellRef}
       className={`app-shell${isFocusMode ? ' app-shell--focus' : ''}`}
       data-document-hidden={isDocumentHidden ? 'true' : 'false'}
+      data-focus-modality="keyboard"
       data-performance-mode={performanceMode}
     >
       <div className="background-glow" aria-hidden="true" />

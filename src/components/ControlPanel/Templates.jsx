@@ -1,18 +1,40 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { scrollIntoSidebarView } from './scrollIntoSidebarView.js'
 
 function Templates({ help, onCancel, onConfirm, onSelect, pendingTemplate, selectedTemplate, t, templates }) {
   const confirmationRef = useRef(null)
+  const cancelButtonRef = useRef(null)
+  const confirmationOpenerRef = useRef(null)
+  const restoreFocusRef = useRef(false)
+  const confirmationLabelId = useId()
+  const confirmationDescriptionId = useId()
   const templateRows = []
   for (let index = 0; index < templates.length; index += 3) {
     templateRows.push(templates.slice(index, index + 3))
   }
 
   useEffect(() => {
-    if (!pendingTemplate) return undefined
-    const animationFrame = requestAnimationFrame(() => scrollIntoSidebarView(confirmationRef.current))
+    if (!pendingTemplate) {
+      if (!restoreFocusRef.current) return undefined
+      const animationFrame = requestAnimationFrame(() => {
+        if (confirmationOpenerRef.current?.isConnected) {
+          confirmationOpenerRef.current.focus({ preventScroll: true })
+        }
+        restoreFocusRef.current = false
+      })
+      return () => cancelAnimationFrame(animationFrame)
+    }
+    const animationFrame = requestAnimationFrame(() => {
+      scrollIntoSidebarView(confirmationRef.current)
+      cancelButtonRef.current?.focus({ preventScroll: true })
+    })
     return () => cancelAnimationFrame(animationFrame)
   }, [pendingTemplate])
+
+  const closeConfirmation = (action) => {
+    restoreFocusRef.current = true
+    action()
+  }
 
   return (
     <div className="templates-content">
@@ -28,7 +50,10 @@ function Templates({ help, onCancel, onConfirm, onSelect, pendingTemplate, selec
                   aria-pressed={isActive}
                   className={`template-option template-option--${index}${isActive ? ' is-selected' : ''}`}
                   key={template.id}
-                  onClick={() => onSelect(template)}
+                  onClick={(event) => {
+                    confirmationOpenerRef.current = event.currentTarget
+                    onSelect(template)
+                  }}
                   type="button"
                 >
                   <span aria-hidden="true">{template.emoji}</span>
@@ -39,14 +64,21 @@ function Templates({ help, onCancel, onConfirm, onSelect, pendingTemplate, selec
             {row.some((template) => template.id === pendingTemplate?.id) ? (
               <div
                 ref={confirmationRef}
+                aria-describedby={confirmationDescriptionId}
+                aria-labelledby={confirmationLabelId}
                 className={`template-confirm template-confirm--after-${row.findIndex((template) => template.id === pendingTemplate.id)}`}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Escape') return
+                  event.preventDefault()
+                  closeConfirmation(onCancel)
+                }}
                 role="alertdialog"
-                aria-label={t('templates.replaceLabel')}
               >
-                <p>{t('templates.replaceQuestion', { name: pendingTemplate.name })}</p>
+                <span className="visually-hidden" id={confirmationLabelId}>{t('templates.replaceLabel')}</span>
+                <p id={confirmationDescriptionId}>{t('templates.replaceQuestion', { name: pendingTemplate.name })}</p>
                 <div>
-                  <button onClick={onConfirm} type="button">{t('templates.replace')}</button>
-                  <button onClick={onCancel} type="button">{t('templates.cancel')}</button>
+                  <button onClick={() => closeConfirmation(onConfirm)} type="button">{t('templates.replace')}</button>
+                  <button ref={cancelButtonRef} onClick={() => closeConfirmation(onCancel)} type="button">{t('templates.cancel')}</button>
                 </div>
               </div>
             ) : null}

@@ -1006,7 +1006,7 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.option-name:focus,
+.option-row-group > .option-row .option-name:focus,
 .percentage-input:focus {
   border-color: #41d8f6;
   box-shadow: 0 0 0 3px rgba(41, 215, 255, 0.12);
@@ -1795,7 +1795,7 @@
   justify-content: center;
   gap: 0.65rem 1.75rem;
   padding: 1.5rem 1rem 0;
-  color: #767286;
+  color: #817d91;
   font-size: 0.75rem;
   font-weight: 550;
   letter-spacing: 0.03em;
@@ -2250,6 +2250,7 @@
 
   .option-name {
     height: 2.5rem;
+    font-size: 1rem;
   }
 
   .probability-selector {
@@ -2717,4 +2718,9 @@
   .collapse-chevron {
     transition: none;
   }
+}
+
+.app-shell[data-focus-modality='keyboard'] :is(button, select, input[type='range'], [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: 2px solid #41d8f6;
+  outline-offset: 3px;
 }

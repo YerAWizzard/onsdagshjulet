@@ -41,7 +41,6 @@ function AboutPopover({ t, version }) {
       <button
         aria-controls={panelId}
         aria-expanded={isOpen}
-        aria-haspopup="dialog"
         aria-label={t('about.open')}
         className="about-button"
         onClick={() => {
@@ -58,7 +57,7 @@ function AboutPopover({ t, version }) {
         className="about-popover"
         hidden={!isOpen}
         id={panelId}
-        role="dialog"
+        role="region"
       >
         <h2 id={headingId}>{t('about.title')}</h2>
         <p>{t('about.paragraph1')}</p>
