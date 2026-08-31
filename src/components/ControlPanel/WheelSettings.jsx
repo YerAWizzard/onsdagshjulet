@@ -27,6 +27,7 @@ function WheelSettings({
   const [minimumChoiceConfirmation, setMinimumChoiceConfirmation] = useState(null)
   const probabilityDescriptionId = useId()
   const probabilityErrorId = useId()
+  const probabilityEditorRef = useRef(null)
   const probabilityInputRef = useRef(null)
   const probabilityTriggerRef = useRef(null)
   const restoreProbabilityFocusRef = useRef(false)
@@ -37,8 +38,39 @@ function WheelSettings({
 
   useEffect(() => {
     if (probabilityEditor) {
-      probabilityInputRef.current?.focus()
-      return undefined
+      let revealFrame = 0
+      const revealEditor = () => {
+        cancelAnimationFrame(revealFrame)
+        revealFrame = requestAnimationFrame(() => {
+          const editor = probabilityEditorRef.current
+          if (!editor || !window.matchMedia('(max-width: 620px)').matches) return
+          const viewport = window.visualViewport
+          const viewportTop = viewport?.offsetTop ?? 0
+          const viewportBottom = viewportTop + (viewport?.height ?? window.innerHeight)
+          const editorRect = editor.getBoundingClientRect()
+          const edgeMargin = 8
+          const isFullyVisible = (
+            editorRect.top >= viewportTop + edgeMargin
+            && editorRect.bottom <= viewportBottom - edgeMargin
+          )
+          if (isFullyVisible) return
+          editor.scrollIntoView({
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          })
+        })
+      }
+      const focusFrame = requestAnimationFrame(() => {
+        probabilityInputRef.current?.focus({ preventScroll: true })
+        revealEditor()
+      })
+      window.visualViewport?.addEventListener('resize', revealEditor, { once: true })
+      return () => {
+        cancelAnimationFrame(focusFrame)
+        cancelAnimationFrame(revealFrame)
+        window.visualViewport?.removeEventListener('resize', revealEditor)
+      }
     }
     if (!restoreProbabilityFocusRef.current) return undefined
     const animationFrame = requestAnimationFrame(() => {
@@ -232,6 +264,7 @@ function WheelSettings({
     if (!editorOpen) return null
     return (
       <form
+        ref={probabilityEditorRef}
         className={`inline-probability-editor${className ? ` ${className}` : ''}`}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
