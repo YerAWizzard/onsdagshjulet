@@ -40,7 +40,7 @@
 }
 
 .wheel-visual--star-win {
-  animation: wheel-star-shimmer 1.85s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: wheel-star-shimmer 2.1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wheel-visual--normal-win .wheel-bulb {
@@ -48,7 +48,7 @@
 }
 
 .wheel-visual--star-win .wheel-bulb {
-  animation: star-bulb-sweep 880ms cubic-bezier(0.16, 1, 0.3, 1) var(--star-victory-delay) 1 both;
+  animation: star-bulb-sweep 1.05s cubic-bezier(0.16, 1, 0.3, 1) var(--star-victory-delay) 1 both;
 }
 
 .wheel-visual::before {
@@ -322,9 +322,10 @@
 }
 
 .wheel-result--star {
+  z-index: 9;
   border-color: #ffe47e;
-  box-shadow: 0 0 28px rgba(255, 209, 102, 0.7), 0 0 65px rgba(255, 79, 163, 0.4), 0 0 90px rgba(41, 215, 255, 0.22);
-  animation: star-panel-arrive 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 38px rgba(255, 232, 122, 0.95), 0 0 90px rgba(255, 181, 31, 0.64), 0 0 135px rgba(255, 79, 163, 0.38);
+  animation: star-panel-arrive 1.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wheel-result--winner::before {
@@ -339,8 +340,65 @@
 }
 
 .wheel-result--star::before {
-  background: linear-gradient(112deg, transparent 24%, rgba(255, 249, 196, 0.2) 45%, rgba(255, 209, 102, 0.34) 52%, transparent 76%);
-  animation-duration: 1.45s;
+  background: linear-gradient(112deg, transparent 20%, rgba(255, 253, 222, 0.34) 43%, rgba(255, 209, 102, 0.58) 52%, transparent 80%);
+  animation-duration: 1.7s;
+}
+
+.star-win-screen {
+  position: fixed;
+  z-index: 8;
+  inset: 0;
+  overflow: hidden;
+  contain: strict;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.star-win-screen::before {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 52%, rgba(255, 251, 211, 0.68) 0%, rgba(255, 213, 80, 0.42) 18%, rgba(255, 164, 31, 0.2) 40%, rgba(82, 35, 0, 0.13) 62%, transparent 78%);
+  content: '';
+  opacity: 0;
+  animation: star-screen-impact 1.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.star-win-screen::after {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  width: min(68vmin, 42rem);
+  aspect-ratio: 1;
+  border: clamp(3px, 0.5vmin, 7px) solid rgba(255, 239, 143, 0.78);
+  border-radius: 50%;
+  box-shadow: 0 0 36px rgba(255, 209, 102, 0.8), inset 0 0 32px rgba(255, 209, 102, 0.42);
+  content: '';
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.18);
+  animation: star-impact-ring 1.55s 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.star-win-screen i {
+  position: absolute;
+  z-index: 1;
+  top: 52%;
+  left: 50%;
+  width: 0.58rem;
+  height: 0.92rem;
+  border-radius: 0.14rem;
+  background: var(--screen-particle-color);
+  box-shadow: 0 0 9px var(--screen-particle-color);
+  opacity: 0;
+  transform: rotate(var(--screen-particle-angle)) translateX(0) scale(0.25) rotate(var(--screen-particle-rotation));
+  transform-origin: center;
+  animation: star-screen-particle 1.8s cubic-bezier(0.12, 0.7, 0.24, 1) var(--screen-particle-delay) both;
+}
+
+.star-win-screen i:nth-child(3n) {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 79% 100%, 50% 76%, 21% 100%, 30% 60%, 0 38%, 38% 36%);
 }
 
 .wheel-result__placeholder {
@@ -555,6 +613,26 @@
   100% { opacity: 0; transform: translate3d(var(--sparkle-drift-x), var(--sparkle-drift-y), 0) scale(1.12) rotate(calc(var(--sparkle-rotation) + 150deg)); }
 }
 
+@keyframes star-screen-impact {
+  0% { opacity: 0; transform: scale(0.7); }
+  20% { opacity: 1; }
+  58% { opacity: 0.72; }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes star-impact-ring {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.18); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.25); }
+}
+
+@keyframes star-screen-particle {
+  0% { opacity: 0; transform: rotate(var(--screen-particle-angle)) translateX(0) scale(0.25) rotate(var(--screen-particle-rotation)); }
+  12% { opacity: 1; }
+  68% { opacity: 0.92; }
+  100% { opacity: 0; transform: rotate(var(--screen-particle-angle)) translateX(var(--screen-particle-distance)) scale(1.15) rotate(calc(var(--screen-particle-rotation) + 190deg)); }
+}
+
 @keyframes countdown-pop {
   from { opacity: 0; transform: scale(0.42) rotate(-6deg); }
   52% { opacity: 1; transform: scale(1.18) rotate(2deg); }
@@ -590,7 +668,7 @@
 
 @keyframes star-bulb-sweep {
   0%, 100% { filter: brightness(1.08); box-shadow: 0 0 9px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1); }
-  42% { filter: brightness(2.2); box-shadow: 0 0 29px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1.42); }
+  42% { filter: brightness(2.75); box-shadow: 0 0 38px currentColor; transform: rotate(var(--bulb-angle)) translateX(calc(50cqw - 11px)) scale(1.62); }
 }
 
 @keyframes normal-panel-glow {
@@ -804,8 +882,14 @@
 .app-shell[data-performance-mode='energy-saver'] .winner-confetti i,
 .app-shell[data-performance-mode='energy-saver'] .winner-star-sparkles i,
 .app-shell[data-performance-mode='energy-saver'] .wheel-result--winner::before,
+.app-shell[data-performance-mode='energy-saver'] .star-win-screen i,
+.app-shell[data-performance-mode='energy-saver'] .star-win-screen::after,
 .app-shell[data-performance-mode='energy-saver'] .star-burst {
   animation: none;
+}
+
+.app-shell[data-performance-mode='energy-saver'] .star-win-screen::before {
+  animation: star-screen-impact 1.05s ease-out both;
 }
 
 .app-shell[data-performance-mode='energy-saver'] .wheel-bulb {
@@ -830,6 +914,9 @@
 .app-shell[data-document-hidden='true'] .winner-confetti i,
 .app-shell[data-document-hidden='true'] .winner-star-sparkles i,
 .app-shell[data-document-hidden='true'] .wheel-result--winner::before,
+.app-shell[data-document-hidden='true'] .star-win-screen::before,
+.app-shell[data-document-hidden='true'] .star-win-screen::after,
+.app-shell[data-document-hidden='true'] .star-win-screen i,
 .app-shell[data-document-hidden='true'] .star-burst {
   animation-play-state: paused !important;
 }
@@ -846,6 +933,9 @@
 .app-shell[data-document-hidden='false'] .winner-confetti i,
 .app-shell[data-document-hidden='false'] .winner-star-sparkles i,
 .app-shell[data-document-hidden='false'] .wheel-result--winner::before,
+.app-shell[data-document-hidden='false'] .star-win-screen::before,
+.app-shell[data-document-hidden='false'] .star-win-screen::after,
+.app-shell[data-document-hidden='false'] .star-win-screen i,
 .app-shell[data-document-hidden='false'] .star-burst {
   animation-play-state: running;
 }
@@ -856,6 +946,9 @@
   .wheel-result__content,
   .wheel-result--winner::before,
   .winner-star-sparkles i,
+  .star-win-screen::before,
+  .star-win-screen::after,
+  .star-win-screen i,
   .star-burst,
   .wheel-result--star {
     animation: none;

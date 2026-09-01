@@ -15,15 +15,40 @@ const STAR_SPARKLES = Array.from({ length: 16 }, (_, index) => ({
   top: `${10 + ((index * 47) % 76)}%`,
 }))
 
+const SCREEN_STAR_PARTICLES = Array.from({ length: 64 }, (_, index) => ({
+  angle: `${(index * 137.5) % 360}deg`,
+  color: ['#fff7b0', '#ffd44f', '#ffb52d', '#fffbe0', '#ffdf76'][index % 5],
+  delay: `${(index % 12) * 0.028}s`,
+  distance: `${58 + (index % 5) * 8}vmax`,
+  rotation: `${(index * 47) % 180}deg`,
+}))
+
 function WheelResult({ onDone, onSpinAgain, showSubWheelActions, t, winner }) {
   return (
-    <div
-      className={`wheel-result${winner?.star ? ' wheel-result--star' : ''}${winner ? ' wheel-result--winner' : ''}`}
-      aria-live="polite"
-      aria-atomic="true"
-    >
-      {winner ? (
-        <div className="wheel-result__content" key={winner.winId}>
+    <>
+      {winner?.star ? (
+        <div className="star-win-screen" key={`star-screen-${winner.winId}`} aria-hidden="true">
+          {SCREEN_STAR_PARTICLES.map((particle, index) => (
+            <i
+              key={index}
+              style={{
+                '--screen-particle-angle': particle.angle,
+                '--screen-particle-color': particle.color,
+                '--screen-particle-delay': particle.delay,
+                '--screen-particle-distance': particle.distance,
+                '--screen-particle-rotation': particle.rotation,
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
+      <div
+        className={`wheel-result${winner?.star ? ' wheel-result--star' : ''}${winner ? ' wheel-result--winner' : ''}`}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {winner ? (
+          <div className="wheel-result__content" key={winner.winId}>
           <div className={`winner-confetti${winner.star ? ' winner-confetti--star' : ''}`} aria-hidden="true">
             {CONFETTI.map((piece, index) => (
               <i
@@ -73,14 +98,15 @@ function WheelResult({ onDone, onSpinAgain, showSubWheelActions, t, winner }) {
               </button>
             </div>
           ) : null}
-        </div>
-      ) : (
-        <div className="wheel-result__placeholder">
-          <span>{t('wheel.waiting')}</span>
-          <strong>{t('wheel.goodLuck')}</strong>
-        </div>
-      )}
-    </div>
+          </div>
+        ) : (
+          <div className="wheel-result__placeholder">
+            <span>{t('wheel.waiting')}</span>
+            <strong>{t('wheel.goodLuck')}</strong>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 
